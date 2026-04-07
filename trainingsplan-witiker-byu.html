@@ -12,24 +12,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --charcoal: #080810;
-      --surface-1: #0f0f1e;
-      --surface-2: #16162a;
-      --surface-3: #1e1e38;
-      --blue: #5C8DFF;
-      --sage: #3DD9A0;
-      --blush: #FF6B9D;
-      --cloud: #F6F6F4;
-      --border: rgba(246,246,244,0.08);
-      --border-accent: rgba(92,141,255,0.35);
+      --charcoal: #06060f;
+      --surface-1: #0d0d1f;
+      --surface-2: #14142a;
+      --surface-3: #1c1c3a;
+      --blue: #3377FF;
+      --sage: #00E699;
+      --blush: #FF1A75;
+      --cloud: #FFFFFF;
+      --border: rgba(255,255,255,0.15);
+      --border-accent: rgba(51,119,255,0.6);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { background: #080810; color: var(--cloud); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-    .glow-blue  { box-shadow: 0 0 24px rgba(92,141,255,0.55), 0 0 6px rgba(92,141,255,0.35); }
-    .glow-sage  { box-shadow: 0 0 24px rgba(61,217,160,0.5),  0 0 6px rgba(61,217,160,0.3); }
-    .glow-blush { box-shadow: 0 0 24px rgba(255,107,157,0.5), 0 0 6px rgba(255,107,157,0.3); }
-    .glow-gold  { box-shadow: 0 0 28px rgba(255,208,64,0.6),  0 0 8px rgba(255,208,64,0.4); }
+    .glow-blue  { box-shadow: none; }
+    .glow-sage  { box-shadow: none; }
+    .glow-blush { box-shadow: none; }
+    .glow-gold  { box-shadow: none; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(246,246,244,0.12); border-radius: 2px; }
@@ -70,11 +70,11 @@ const { useState, useCallback, useMemo, useRef, useEffect } = React;
 
 // ── BRAND COLORS ──────────────────────────────────
 const C = {
-  blue:  '#5C8DFF', blueDim:  'rgba(92,141,255,0.15)',  blueBorder: 'rgba(92,141,255,0.4)',
-  sage:  '#3DD9A0', sageDim:  'rgba(61,217,160,0.13)',  sageBorder: 'rgba(61,217,160,0.38)',
-  blush: '#FF6B9D', blushDim: 'rgba(255,107,157,0.13)', blushBorder:'rgba(255,107,157,0.38)',
-  gold:  '#FFD040', goldDim:  'rgba(255,208,64,0.13)',  goldBorder: 'rgba(255,208,64,0.38)',
-  cloud: '#F6F6F4',
+  blue:  '#3377FF', blueDim:  'rgba(51,119,255,0.25)',  blueBorder: 'rgba(51,119,255,0.65)',
+  sage:  '#00E699', sageDim:  'rgba(0,230,153,0.25)',   sageBorder: 'rgba(0,230,153,0.65)',
+  blush: '#FF1A75', blushDim: 'rgba(255,26,117,0.25)',   blushBorder:'rgba(255,26,117,0.65)',
+  gold:  '#FFC000', goldDim:  'rgba(255,192,0,0.25)',   goldBorder: 'rgba(255,192,0,0.65)',
+  cloud: '#FFFFFF',
 };
 
 const RACE_DATE = new Date('2026-05-14T12:00:00');
@@ -180,23 +180,23 @@ const INITIAL_WEEKS = [
 
 // ── HELPERS ───────────────────────────────────────
 const TAG_STYLE = {
-  Easy:       { bg:'rgba(61,217,160,0.18)',   color:'#3DD9A0' },
-  Recovery:   { bg:'rgba(246,246,244,0.1)',   color:'rgba(246,246,244,0.65)' },
-  Speed:      { bg:'rgba(92,141,255,0.22)',   color:'#7FAAFF' },
-  Fartlek:    { bg:'rgba(92,141,255,0.22)',   color:'#7FAAFF' },
-  Tempo:      { bg:'rgba(92,141,255,0.25)',   color:'#7FAAFF' },
-  Intervalle: { bg:'rgba(92,141,255,0.25)',   color:'#7FAAFF' },
-  Hills:      { bg:'rgba(255,208,64,0.22)',   color:'#FFD040' },
-  Downhill:   { bg:'rgba(255,107,157,0.22)',  color:'#FF6B9D' },
-  Uetliberg:  { bg:'rgba(255,107,157,0.15)',  color:'rgba(255,140,175,0.85)' },
-  PowerHike:  { bg:'rgba(92,141,255,0.18)',   color:'#90C0FF' },
-  Long:       { bg:'rgba(200,140,255,0.22)',  color:'#CC99FF' },
-  B2B:        { bg:'rgba(255,107,157,0.2)',   color:'#FF6B9D' },
-  Simulation: { bg:'rgba(255,140,90,0.22)',   color:'#FF9060' },
-  Taper:      { bg:'rgba(61,217,160,0.14)',   color:'rgba(61,217,160,0.85)' },
-  Peak:       { bg:'rgba(200,140,255,0.25)',  color:'#CC99FF' },
-  'Race-Specific':{ bg:'rgba(255,107,157,0.25)', color:'#FF6B9D' },
-  'Nutrition-Test':{ bg:'rgba(61,217,160,0.2)',  color:'#3DD9A0' },
+  Easy:       { bg:'rgba(46,235,168,0.26)',   color:'#2EEBA8' },
+  Recovery:   { bg:'rgba(246,246,244,0.12)',  color:'rgba(246,246,244,0.75)' },
+  Speed:      { bg:'rgba(102,153,255,0.32)',  color:'#99BBFF' },
+  Fartlek:    { bg:'rgba(102,153,255,0.32)',  color:'#99BBFF' },
+  Tempo:      { bg:'rgba(102,153,255,0.35)',  color:'#99BBFF' },
+  Intervalle: { bg:'rgba(102,153,255,0.35)',  color:'#99BBFF' },
+  Hills:      { bg:'rgba(255,208,64,0.32)',   color:'#FFD040' },
+  Downhill:   { bg:'rgba(255,77,143,0.32)',   color:'#FF4D8F' },
+  Uetliberg:  { bg:'rgba(255,77,143,0.22)',   color:'rgba(255,150,185,0.95)' },
+  PowerHike:  { bg:'rgba(102,153,255,0.26)',  color:'#AACCFF' },
+  Long:       { bg:'rgba(200,140,255,0.32)',  color:'#DD99FF' },
+  B2B:        { bg:'rgba(255,77,143,0.28)',   color:'#FF4D8F' },
+  Simulation: { bg:'rgba(255,140,90,0.32)',   color:'#FF9060' },
+  Taper:      { bg:'rgba(46,235,168,0.22)',   color:'rgba(46,235,168,0.95)' },
+  Peak:       { bg:'rgba(200,140,255,0.35)',  color:'#DD99FF' },
+  'Race-Specific':{ bg:'rgba(255,77,143,0.35)', color:'#FF4D8F' },
+  'Nutrition-Test':{ bg:'rgba(46,235,168,0.28)', color:'#2EEBA8' },
 };
 const W_CONFIG = {
   run:      { color:C.blue,  bgDim:C.blueDim,  label:'Lauf',    icon:'⚡' },
@@ -381,9 +381,9 @@ function WorkoutPill({w, day, weekId, onOpen, isDragging, onDragStart, onDragEnd
       <span style={{fontSize:14, flexShrink:0}}>{cfg.icon}</span>
       <div style={{flex:1, minWidth:0}}>
         <div style={{display:'flex', alignItems:'center', gap:6}}>
-          <span style={{fontSize:13, fontWeight:600, color:cfg.color, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{w.title}</span>
-          {w.type==='run' && w.km && <span style={{fontSize:12, color:'rgba(246,246,244,0.55)', flexShrink:0, fontWeight:600}}>{w.km}km</span>}
-          {w.routineKey && <span style={{fontSize:11, fontWeight:700, color:'#161616', background:ST[w.routineKey]?.color||C.sage, padding:'1px 6px', borderRadius:4, flexShrink:0}}>{w.routineKey}</span>}
+          <span style={{fontSize:13, fontWeight:700, color:'#FFFFFF', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{w.title}</span>
+          {w.type==='run' && w.km && <span style={{fontSize:12, color:'rgba(255,255,255,0.7)', flexShrink:0, fontWeight:600}}>{w.km}km</span>}
+          {w.routineKey && <span style={{fontSize:11, fontWeight:800, color:'#FFFFFF', background:ST[w.routineKey]?.color||C.sage, padding:'1px 6px', borderRadius:4, flexShrink:0, border:'1px solid rgba(255,255,255,0.2)'}}>{w.routineKey}</span>}
         </div>
         {w.type==='run' && w.tags && w.tags.length > 0 && (
           <div style={{display:'flex', flexWrap:'wrap', gap:4, marginTop:4}}>
@@ -588,7 +588,7 @@ function RunModal({workout, day, onClose, onToggleComplete, isCompleted, onEdit,
           {/* Actions */}
           <div style={{display:'flex', gap:8}}>
             <button onClick={()=>{onToggleComplete(workout.id);onClose();}}
-              style={{flex:1, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.sage, color:isCompleted?'rgba(246,246,244,0.4)':'#161616', border:`1px solid ${isCompleted?'var(--border)':C.sage}`}}>
+              style={{flex:1, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.sage, color:isCompleted?'rgba(246,246,244,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':C.sage}`}}>
               {isCompleted ? '↩ Rückgängig' : '✓ Abgeschlossen'}
             </button>
             <button onClick={onMoveOpen}
@@ -612,7 +612,7 @@ function StrengthModal({workout, day, onClose, onToggleComplete, isCompleted}) {
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4}}>
             <div>
               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:4}}>
-                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#161616', padding:'3px 8px', borderRadius:4}}>{workout.routineKey}</span>
+                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#FFFFFF', padding:'3px 8px', borderRadius:4, border:'1px solid rgba(255,255,255,0.2)'}}>{workout.routineKey}</span>
                 <h2 style={{fontSize:17, fontWeight:800, color:r.color}}>{r.name}</h2>
               </div>
               <p style={{fontSize:12, color:'rgba(246,246,244,0.35)'}}>{r.focus} · {r.dur}</p>
@@ -626,7 +626,7 @@ function StrengthModal({workout, day, onClose, onToggleComplete, isCompleted}) {
         <div style={{padding:'0 20px 20px'}}>
           {r.exIds.map(id => <ExCard key={id} exId={id}/>)}
           <button onClick={()=>{onToggleComplete(workout.id);onClose();}}
-            style={{width:'100%', marginTop:16, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':r.color, color:isCompleted?'rgba(246,246,244,0.4)':'#161616', border:`1px solid ${isCompleted?'var(--border)':r.color}`}}>
+            style={{width:'100%', marginTop:16, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':r.color, color:isCompleted?'rgba(246,246,244,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':r.color}`}}>
             {isCompleted?'↩ Rückgängig':'✓ Training abgeschlossen'}
           </button>
         </div>
@@ -670,7 +670,7 @@ function MobilityModal({workout, day, onClose, onToggleComplete, isCompleted}) {
             </div>
           ))}
           <button onClick={()=>{onToggleComplete(workout.id);onClose();}}
-            style={{padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.blush, color:isCompleted?'rgba(246,246,244,0.4)':'#161616', border:`1px solid ${isCompleted?'var(--border)':C.blush}`}}>
+            style={{padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.blush, color:isCompleted?'rgba(246,246,244,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':C.blush}`}}>
             {isCompleted?'↩ Rückgängig':'✓ Mobility abgeschlossen'}
           </button>
         </div>
@@ -707,7 +707,7 @@ function RaceModal({onClose}) {
               <div key={i} style={{display:'flex', gap:8, fontSize:13, color:'rgba(255,217,125,0.7)', marginBottom:6}}><span style={{color:C.gold, flexShrink:0}}>→</span>{s}</div>
             ))}
           </div>
-          <button onClick={onClose} style={{width:'100%', padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:C.gold, color:'#161616', border:'none'}}>Schliessen</button>
+          <button onClick={onClose} style={{width:'100%', padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:C.gold, color:'#FFFFFF', border:'none'}}>Schliessen</button>
         </div>
       </div>
     </div>
@@ -776,7 +776,7 @@ function OverviewTab({plan, edits, setActiveWeek, setActiveTab}) {
           {Object.entries(ST).map(([key,r])=>(
             <div key={key} style={{borderRadius:12, padding:14, background:'var(--surface-2)', border:'1px solid var(--border)'}}>
               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:4}}>
-                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#161616', padding:'2px 8px', borderRadius:4}}>{key}</span>
+                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#FFFFFF', padding:'2px 8px', borderRadius:4, border:'1px solid rgba(255,255,255,0.2)'}}>{key}</span>
                 <span style={{fontSize:14, fontWeight:700, color:r.color}}>{r.name}</span>
               </div>
               <p style={{fontSize:12, color:'rgba(246,246,244,0.55)', marginBottom:10}}>{r.focus}</p>
@@ -944,8 +944,8 @@ function App() {
             <div style={{background:'var(--surface-1)', borderRadius:16, padding:16, marginBottom:20, border:'1px solid var(--border)'}}>
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12}}>
                 <div>
-                  <div style={{fontSize:20, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em'}}>{week.name}</div>
-                  <div style={{fontSize:12, color:'rgba(246,246,244,0.35)', marginTop:2}}>{week.dateRange}</div>
+                  <div style={{fontSize:20, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em'}}>{week.label} – {week.name}</div>
+                  <div style={{fontSize:12, color:week.color, fontWeight:600, marginTop:3}}>{week.name.replace(/\s*[\d~]+km/i,'').trim()} · {week.dateRange}</div>
                 </div>
                 <div style={{textAlign:'right'}}>
                   <div style={{fontSize:28, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em', lineHeight:1}}>
