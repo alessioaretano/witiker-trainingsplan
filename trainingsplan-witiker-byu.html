@@ -800,10 +800,60 @@ function OverviewTab({plan, edits, setActiveWeek, setActiveTab}) {
   );
 }
 
+// ── GARMIN WEEK EXPORT MODAL ──────────────────────
+function GarminWeekModal({week, onClose}) {
+  const exportable = week.days.flatMap(day =>
+    day.workouts.filter(w => w.type==='run' && isExportable(w)).map(w => ({w, date:day.date, label:day.label}))
+  );
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()}>
+        <div style={{padding:'20px 20px 0', borderBottom:'1px solid var(--border)', position:'sticky', top:0, background:'var(--surface-1)', zIndex:1}}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', paddingBottom:14}}>
+            <div>
+              <div style={{fontSize:16, fontWeight:800, color:C.gold}}>⌚ Garmin – {week.label} {week.name}</div>
+              <p style={{fontSize:12, color:'rgba(255,217,125,0.5)', marginTop:3}}>Strukturierte Einheiten als TCX herunterladen</p>
+            </div>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+          </div>
+        </div>
+        <div style={{padding:20, display:'flex', flexDirection:'column', gap:12}}>
+          {exportable.length === 0 ? (
+            <p style={{fontSize:13, color:'rgba(246,246,244,0.4)', textAlign:'center', padding:'20px 0'}}>Keine strukturierten Einheiten diese Woche.</p>
+          ) : exportable.map(({w, date, label}) => (
+            <div key={w.id} style={{background:'var(--surface-2)', borderRadius:12, padding:14, border:'1px solid rgba(255,217,125,0.15)', display:'flex', alignItems:'center', gap:12}}>
+              <div style={{flex:1, minWidth:0}}>
+                <div style={{fontSize:13, fontWeight:700, color:'var(--cloud)'}}>{w.title}</div>
+                <div style={{fontSize:11, color:'rgba(255,217,125,0.55)', marginTop:2}}>{label} · {garminSummary(w)}</div>
+              </div>
+              <button onClick={()=>dlTCX(w, date)} style={{padding:'8px 12px', borderRadius:8, background:'rgba(255,217,125,0.12)', border:'1px solid rgba(255,217,125,0.35)', color:C.gold, fontSize:12, fontWeight:700, cursor:'pointer', flexShrink:0, whiteSpace:'nowrap'}}>⬇ TCX</button>
+            </div>
+          ))}
+          <div style={{marginTop:4, background:'rgba(0,0,0,0.25)', borderRadius:10, padding:14, fontSize:12, color:'rgba(255,217,125,0.45)', lineHeight:1.8}}>
+            <div style={{fontWeight:700, color:'rgba(255,217,125,0.7)', marginBottom:6}}>So importierst du in Garmin Connect:</div>
+            1. TCX herunterladen (oben) → Datei speichern<br/>
+            2. Garmin Connect App öffnen → Mehr → Workouts<br/>
+            3. Oben rechts: Import → Datei auswählen<br/>
+            4. Beim nächsten Sync → automatisch auf der Uhr
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── MAIN APP ──────────────────────────────────────
 function App() {
-  const [plan, setPlan] = useState(() => deepCopy(INITIAL_WEEKS));
-  const [activeWeek, setActiveWeek] = useState(0);
+  const [plan, setPlan] = useState(() => {
+    try { const s=localStorage.getItem('aneo_plan'); if(s) return JSON.parse(s); } catch {}
+    return deepCopy(INITIAL_WEEKS);
+  });
+  const [activeWeek, setActiveWeek] = useState(() => {
+    try { const s=localStorage.getItem('aneo_week'); if(s!==null) return parseInt(s)||0; } catch {}
+    const today=new Date();
+    const idx=INITIAL_WEEKS.findIndex(w=>w.days.some(d=>new Date(d.date+'T12:00:00').toDateString()===today.toDateString()));
+    return idx>=0?idx:0;
+  });
   const [activeTab, setActiveTab] = useState('plan');
   const [modal, setModal] = useState(null);   // {type, workout, day, weekId}
   const [moveModal, setMoveModal] = useState(null); // {workout, sourceDayDate, sourceWeekId}
@@ -815,9 +865,12 @@ function App() {
   });
   const [dragState, setDragState] = useState(null); // {workoutId, sourceDayDate, sourceWeekId}
   const [dropTarget, setDropTarget] = useState(null); // dayDate
+  const [garminWeek, setGarminWeek] = useState(false);
 
   useEffect(()=>{ try{localStorage.setItem('aneo_done',JSON.stringify([...completed]));}catch{} },[completed]);
   useEffect(()=>{ try{localStorage.setItem('aneo_edits',JSON.stringify(edits));}catch{} },[edits]);
+  useEffect(()=>{ try{localStorage.setItem('aneo_week',String(activeWeek));}catch{} },[activeWeek]);
+  useEffect(()=>{ try{localStorage.setItem('aneo_plan',JSON.stringify(plan));}catch{} },[plan]);
 
   const cd = countdown();
   const week = plan[activeWeek];
@@ -947,11 +1000,12 @@ function App() {
                   <div style={{fontSize:20, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em'}}>{week.label} – {week.name}</div>
                   <div style={{fontSize:12, color:week.color, fontWeight:600, marginTop:3}}>{week.name.replace(/\s*[\d~]+km/i,'').trim()} · {week.dateRange}</div>
                 </div>
-                <div style={{textAlign:'right'}}>
+                <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8}}>
                   <div style={{fontSize:28, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em', lineHeight:1}}>
                     {Math.round(weekKmDone(week, edits, completed))}
                     <span style={{fontSize:14, color:'rgba(246,246,244,0.3)', fontWeight:400, marginLeft:4}}>/ {week.targetKm} km</span>
                   </div>
+                  <button onClick={()=>setGarminWeek(true)} style={{display:'flex', alignItems:'center', gap:5, padding:'5px 10px', borderRadius:8, background:'rgba(255,217,125,0.1)', border:'1px solid rgba(255,217,125,0.3)', color:C.gold, fontSize:11, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap'}}>⌚ Garmin</button>
                 </div>
               </div>
               <div style={{height:4, background:'rgba(246,246,244,0.07)', borderRadius:2, overflow:'hidden', marginBottom:14}}>
@@ -1014,6 +1068,9 @@ function App() {
       {renderModal()}
       {moveModal && (
         <MoveModal data={moveModal} plan={plan} onMove={handleMove} onClose={()=>setMoveModal(null)}/>
+      )}
+      {garminWeek && (
+        <GarminWeekModal week={week} onClose={()=>setGarminWeek(false)}/>
       )}
     </div>
   );
