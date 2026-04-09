@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <title>ANEO Training</title>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -80,8 +80,8 @@
     .pill:active{opacity:.7;transform:scale(.98);}
     .pill.dragging{opacity:.3;transform:scale(.95);}
     .drop-zone.over{border-color:var(--orange)!important;background:rgba(249,115,22,.06)!important;}
-    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,10,8,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:40;padding:8px 0 max(8px,env(safe-area-inset-bottom));display:flex;}
-    .bottom-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,8,9,.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:40;padding:10px 0 0;padding-bottom:max(20px,env(safe-area-inset-bottom));display:flex;}
+    .bottom-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;min-height:50px;}
     @media(max-width:639px){.desktop-only{display:none!important;}}
     @media(min-width:640px){.mobile-only{display:none!important;}.bottom-nav{display:none!important;}}
     .stat-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;}
@@ -208,77 +208,115 @@ const race=()=>({id:'RACE',type:'race',title:'WITIKER BACKYARD ULTRA'});
 const day =(date,label,workouts)=>({date,label,workouts:[...workouts]});
 
 /* ══════════════════════════════════════════════════
-   TRAININGSPLAN – ÜBERARBEITET v2
-   HRmax 198 · KW16 Wiedereinstieg · Ziel 62+ Runden
+   TRAININGSPLAN – ÜBERARBEITET v4
+   KW15: 70km (absolviert) → KW16: 90km → KW17: 108km (+20%)
+   KW18: 130km (+20%, Peak) → KW19: 65km (Taper) → Race: 22km
    ══════════════════════════════════════════════════ */
 const INIT_WEEKS=[
-  {id:1,label:'KW16',name:'Wiedereinstieg',dateRange:'13.–19. Apr',targetKm:70,color:'#3B6FD4',phase:'Basis',days:[
+  // KW15: 70km → laufende Woche (6.–12. Apr)
+  // Mo12 bereits heute (9. Apr) → Sa/So noch ausstehend
+  // 8+10+11+12+10+12+7 = 70 ✓
+  {id:0,label:'KW15',name:'Ramp-Up',dateRange:'6.–12. Apr',targetKm:70,color:'#60A5FA',phase:'Basis',days:[
+    day('2026-04-06','Mo 6. Apr',[
+      run('k15-1','Easy Run',8,52,'Z1–Z2','Wocheneinstieg. Sehr locker. HR <150bpm.',['Easy']),
+      mob('k15-m1'),
+    ]),
+    day('2026-04-07','Di 7. Apr',[
+      run('k15-2','Easy Run',10,65,'Z1–Z2','Locker. HR <153bpm.',['Easy']),
+    ]),
+    day('2026-04-08','Mi 8. Apr',[
+      run('k15-3','Easy + Power Hike',11,72,'Z1–Z2','Easy mit 20 Min Power Hike. Arme aktiv, OKörper vor.',['Easy','PowerHike']),
+      str('k15-s1','A'),
+      mob('k15-m2'),
+    ]),
+    day('2026-04-09','Do 9. Apr',[
+      run('k15-4','Easy Run',12,78,'Z1–Z2','Volumen. HR <155bpm.',['Easy']),
+      mob('k15-m3'),
+    ]),
+    day('2026-04-10','Fr 10. Apr',[
+      run('k15-5','Easy Run',10,65,'Z1–Z2','Locker. Morgen Downhill.',['Easy']),
+      str('k15-s2','B'),
+    ]),
+    day('2026-04-11','Sa 11. Apr',[
+      run('k15-6','Uetliberg – Downhill Intro',12,88,'Z1–Z3','3–4 Runden. Technik im Vordergrund. Kurze Bodenkontaktzeit bergab, Frequenz erhöhen. Power Hike rauf. Knie beobachten.',['Downhill','PowerHike']),
+      mob('k15-m4','Mobility 20 Min (Quad + Knie)'),
+    ]),
+    day('2026-04-12','So 12. Apr',[
+      run('k15-7','Easy Recovery',7,48,'Z1','Sehr locker nach Downhill. HR <133bpm. B2B – Beine drehen.',['Easy','Recovery','B2B']),
+      mob('k15-m5'),
+    ]),
+  ]},
+
+  // KW16: 90km → 12+12+14+14+12+18+8 = 90 ✓
+  {id:1,label:'KW16',name:'Wiedereinstieg',dateRange:'13.–19. Apr',targetKm:90,color:'#3B6FD4',phase:'Basis',days:[
     day('2026-04-13','Mo 13. Apr',[
-      run('r1-1','Easy Run',8,55,'Z1–Z2','Erster Tag nach Pause. Keine Pace-Vorgabe. HR <150bpm. Gefühl zurückbekommen – das ist alles.',['Easy','Recovery']),
+      run('r1-1','Easy Run',12,78,'Z1–Z2','Direkter Wiedereinstieg nach Pause. HR <152bpm. Keine Pace-Vorgabe – Puls führt. Gefühl zurückbekommen.',['Easy','Recovery']),
       mob('m1-1'),
     ]),
     day('2026-04-14','Di 14. Apr',[
-      run('r1-2','Easy Run',10,65,'Z1–Z2','Locker aufbauen. HR <153bpm. Wie Beine sich anfühlen ist wichtiger als km.',['Easy']),
+      run('r1-2','Easy Run',12,78,'Z1–Z2','Locker. HR <153bpm. Beine sollten sich bereits besser anfühlen als gestern.',['Easy']),
     ]),
     day('2026-04-15','Mi 15. Apr',[
-      run('r1-3','Easy + Power Hike',12,80,'Z1–Z2','Easy Run + 20 Min Power Hike integriert. Arme aktiv, OKörper leicht vor, maximales Gehtempo ohne zu laufen. HR in Z1–Z2 auch beim Hiken.',['Easy','PowerHike']),
+      run('r1-3','Easy + Power Hike',14,92,'Z1–Z2','Easy Run + 25 Min Power Hike. Arme aktiv, OKörper leicht vor, maximales Gehtempo ohne zu laufen. HR Z1–Z2 auch beim Hiken.',['Easy','PowerHike']),
       str('s1-1','A'),
       mob('m1-2'),
     ]),
     day('2026-04-16','Do 16. Apr',[
-      run('r1-4','Easy Run',12,78,'Z1–Z2','Volumen. HR <155bpm. Schrittfrequenz ~178–180spm anstreben.',['Easy']),
+      run('r1-4','Easy Run',14,90,'Z1–Z2','Volumen. HR <156bpm. Schrittfrequenz ~178–180spm anstreben.',['Easy']),
       mob('m1-3'),
     ]),
     day('2026-04-17','Fr 17. Apr',[
-      run('r1-5','Easy Run',10,65,'Z1–Z2','Locker. Morgen erste Downhill-Session – Quads schonen.',['Easy']),
+      run('r1-5','Easy Run',12,78,'Z1–Z2','Locker. Morgen Downhill-Session – Quads schonen.',['Easy']),
       str('s1-2','B'),
     ]),
     day('2026-04-18','Sa 18. Apr',[
-      run('r1-6','Uetliberg – Downhill Intro',13,95,'Z1–Z3','3–4 Runden. NICHT maximal – Technik steht im Vordergrund. Kurze Bodenkontaktzeit bergab, Frequenz erhöhen statt bremsen. Power Hike rauf zwischen Abfahrten. Knie beobachten.',['Downhill','PowerHike']),
+      run('r1-6','Uetliberg – Downhill Intro',18,125,'Z1–Z3','4–5 Runden. NICHT maximal – Technik steht im Vordergrund. Kurze Bodenkontaktzeit bergab, Frequenz erhöhen statt bremsen. Power Hike rauf zwischen Abfahrten. Knie beobachten.',['Downhill','PowerHike']),
       mob('m1-4','Mobility 20 Min (Quad + Knie)'),
     ]),
     day('2026-04-19','So 19. Apr',[
-      run('r1-7','Easy Recovery',8,55,'Z1','Sehr locker nach Downhill. HR <135bpm. Erster B2B – Beine drehen, nicht belasten.',['Easy','Recovery','B2B']),
+      run('r1-7','Easy Recovery',8,55,'Z1','Sehr locker nach Downhill. HR <135bpm. B2B – Beine drehen, nicht belasten.',['Easy','Recovery','B2B']),
       mob('m1-5'),
     ]),
   ]},
 
-  {id:2,label:'KW17',name:'Aufbau I',dateRange:'20.–26. Apr',targetKm:100,color:'#F97316',phase:'Aufbau',days:[
+  // KW17: 108km (+20%) → 15+14+16+16+13+22+12 = 108 ✓
+  {id:2,label:'KW17',name:'Aufbau I',dateRange:'20.–26. Apr',targetKm:108,color:'#F97316',phase:'Aufbau',days:[
     day('2026-04-20','Mo 20. Apr',[
-      run('r2-1','Easy Run',14,90,'Z1–Z2','Wocheneinstieg. HR <155bpm. Erholung nach B2B prüfen – bei starker Ermüdung 2km kürzen.',['Easy']),
+      run('r2-1','Easy Run',15,96,'Z1–Z2','Wocheneinstieg. HR <156bpm. Erholung nach B2B prüfen – bei starker Ermüdung 2km kürzen.',['Easy']),
       str('s2-1','A'),
       mob('m2-1'),
     ]),
     day('2026-04-21','Di 21. Apr',[
-      run('r2-2','Fartlek – Erste Speedarbeit',13,75,'Z2–Z4','10 Min WU Z1–Z2. 8 × (2 Min Z3–Z4 / 2 Min Z1 easy). 10 Min CD Z1. HR-geführt – wenn Z4 nicht ohne Z5 erreichbar, kürzen auf 6 Reps.',['Speed','Fartlek']),
+      run('r2-2','Fartlek – Erste Speedarbeit',14,80,'Z2–Z4','10 Min WU Z1–Z2. 8 × (2 Min Z3–Z4 / 2 Min Z1 easy). 10 Min CD Z1. HR-geführt – wenn Z4 nicht ohne Z5 erreichbar, kürzen auf 6 Reps.',['Speed','Fartlek']),
       mob('m2-2'),
     ]),
     day('2026-04-22','Mi 22. Apr',[
-      run('r2-3','Easy + Power Hike',15,100,'Z1–Z2','Easy mit 30 Min Power Hike-Block. Hike-Schwelle testen: ab welchem Anstieg ist schnelles Gehen effizienter als Joggen? Pace notieren.',['Easy','PowerHike']),
+      run('r2-3','Easy + Power Hike',16,105,'Z1–Z2','Easy mit 35 Min Power Hike-Block. Hike-Schwelle testen: ab welchem Anstieg ist schnelles Gehen effizienter als Joggen? Pace notieren.',['Easy','PowerHike']),
       str('s2-2','B'),
       mob('m2-3'),
     ]),
     day('2026-04-23','Do 23. Apr',[
-      run('r2-4','Easy Run',15,95,'Z1–Z2','Volumen-Tag. HR <158bpm. Gleichmässig durch.',['Easy']),
+      run('r2-4','Easy Run',16,102,'Z1–Z2','Volumen-Tag. HR <158bpm. Gleichmässig durch.',['Easy']),
       mob('m2-4'),
     ]),
     day('2026-04-24','Fr 24. Apr',[
-      run('r2-5','Easy Run',11,72,'Z1–Z2','Locker. Krafteinheit heute – Beine schonen vor Sa/So.',['Easy']),
+      run('r2-5','Easy Run',13,84,'Z1–Z2','Locker. Krafteinheit heute – Beine schonen vor Sa/So.',['Easy']),
       str('s2-3','C'),
     ]),
     day('2026-04-25','Sa 25. Apr',[
-      run('r2-6','Uetliberg – Downhill Progressiv',18,130,'Z1–Z3','5–6 Runden. Erste 3 kontrolliert. Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Power Hike konsequent bergauf. Zeit pro Runde notieren → Benchmark für KW18-Simulation.',['Downhill','PowerHike']),
+      run('r2-6','Uetliberg – Downhill Progressiv',22,152,'Z1–Z3','6–7 Runden. Erste 3–4 kontrolliert. Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Power Hike konsequent bergauf. Zeit pro Runde notieren → Benchmark für KW18-Simulation.',['Downhill','PowerHike']),
       mob('m2-5','Mobility 20 Min (Quad + Hüfte)'),
     ]),
     day('2026-04-26','So 26. Apr',[
-      run('r2-7','Long Run Easy',14,92,'Z1–Z2','B2B mit Samstag. Easy. Ermüdungsresistenz-Einheit. HR <150bpm. Ernährung alle 40 Min testen.',['Easy','Long','B2B']),
+      run('r2-7','Long Run Easy',12,78,'Z1–Z2','B2B mit Samstag. Easy. Ermüdungsresistenz-Einheit. HR <150bpm. Ernährung alle 40 Min testen.',['Easy','Long','B2B']),
       mob('m2-6'),
     ]),
   ]},
 
+  // KW18: 130km (+20%) → 18+16+18+18+13+22+25 = 130 ✓
   {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:130,color:'#F87171',phase:'Peak',days:[
     day('2026-04-27','Mo 27. Apr',[
-      run('r3-1','Easy Run',16,105,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm.',['Easy']),
+      run('r3-1','Easy Run',18,115,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm. Gut essen und trinken.',['Easy']),
       str('s3-1','A'),
       mob('m3-1'),
     ]),
@@ -287,71 +325,73 @@ const INIT_WEEKS=[
       mob('m3-2'),
     ]),
     day('2026-04-29','Mi 29. Apr',[
-      run('r3-3','Easy + Power Hike',20,135,'Z1–Z2','Easy mit 45 Min Power Hike. Hike-Pace auf definiertem Hügel dokumentieren. Schwellenpunkt bestimmen.',['Easy','PowerHike']),
+      run('r3-3','Easy + Power Hike',18,118,'Z1–Z2','Easy mit 45 Min Power Hike. Hike-Pace auf definiertem Hügel dokumentieren. Schwellenpunkt bestimmen.',['Easy','PowerHike']),
       str('s3-2','B'),
       mob('m3-3'),
     ]),
     day('2026-04-30','Do 30. Apr',[
-      run('r3-4','Easy Run',20,130,'Z1–Z2','Grosser Volumen-Tag. Locker. Gut trinken und essen. Bei Erschöpfung 2km kürzen.',['Easy']),
+      run('r3-4','Easy Run',18,115,'Z1–Z2','Grosser Volumen-Tag. Locker. Gut trinken und essen. Bei Erschöpfung 2km kürzen.',['Easy']),
       mob('m3-4'),
     ]),
     day('2026-05-01','Fr 1. Mai',[
-      run('r3-5','Early Morning – Nacht-Simulation 1',18,115,'Z1–Z2','FRÜHSTART 04:30–05:00 UHR. Stirnlampe obligatorisch. Erste Dunkel/Morgendämmerungs-Simulation. Gleiche Intensität – nur zeitlich verschoben. Gear-Test.',['Easy','NachtSimu']),
+      run('r3-5','Early Morning – Nacht-Simulation 1',13,85,'Z1–Z2','FRÜHSTART 04:30–05:00 UHR. Stirnlampe obligatorisch. Erste Dunkel/Morgendämmerungs-Simulation. Gleiche Intensität – nur zeitlich verschoben. Gear-Test.',['Easy','NachtSimu']),
       str('s3-3','C','leichter'),
     ]),
     day('2026-05-02','Sa 2. Mai',[
-      run('r3-6','Uetliberg – Race Simulation',25,175,'Z1–Z3','6–7 Runden. Vollsimulation: Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: 5 Min Pause (Crew-Sim). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
+      run('r3-6','Witiker Simulation',22,152,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde, 125Hm). Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
       mob('m3-5','Mobility 20 Min (Race Recovery)'),
     ]),
     day('2026-05-03','So 3. Mai',[
-      run('r3-7','Long Run – Peak Abschluss',32,210,'Z1–Z2','Längster Lauf der Vorbereitung. Z1–Z2, egal wie langsam. Ernährung alle 30–35 Min. HR <155bpm. Danach beginnt Ramp-Down. Dieser Tag ist Härtetest – kein Druck.',['Long','Easy','B2B','Peak']),
+      run('r3-7','Long Run – Peak Abschluss',25,165,'Z1–Z2','Längster Lauf der Vorbereitung. Z1–Z2, egal wie langsam. Ernährung alle 30–35 Min. HR <155bpm. Danach beginnt Ramp-Down. Kein Druck – Beine bewegen, nicht kämpfen.',['Long','Easy','B2B','Peak']),
       mob('m3-6'),
     ]),
   ]},
 
-  {id:4,label:'KW19',name:'Taper',dateRange:'4.–10. Mai',targetKm:90,color:'#8B5CF6',phase:'Taper',days:[
+  // KW19: 65km (50% von Peak) – letzte Speed Di, ab Mi nur Easy, Sa Gear-Check Witiker
+  // Mo 4. Mai = 10 Tage vor Rennen → echter 10-Tage-Taper ✓
+  // 12+12+10+8+7+8+8 = 65 ✓
+  {id:4,label:'KW19',name:'Taper',dateRange:'4.–10. Mai',targetKm:65,color:'#8B5CF6',phase:'Taper',days:[
     day('2026-05-04','Mo 4. Mai',[
-      run('r4-1','Easy Run',15,100,'Z1–Z2','Taper beginnt. Volumen runter, Qualität gleich. HR <150bpm. Kein Kraft heute.',['Easy']),
+      run('r4-1','Easy Run',12,78,'Z1–Z2','Taper beginnt. Volumen stark runter. HR <150bpm. Kein Kraft.',['Easy','Taper']),
       mob('m4-1'),
     ]),
     day('2026-05-05','Di 5. Mai',[
-      run('r4-2','Letzte Speed-Session',14,78,'Z2–Z3','15 Min WU. 4 × (4 Min Tempo Z3 / 3 Min easy Z1). 12 Min CD. Letzte Intensität der Saison. Gefühl, nicht Zeit.',['Tempo','Speed']),
-      str('s4-1','A','2×10, leicht'),
+      run('r4-2','Letzte Speed-Session',12,68,'Z2–Z3','10 Min WU. 4 × (3 Min Tempo Z3 / 2 Min easy Z1). 10 Min CD. Letzte Intensität der Saison. Gefühl, nicht Zeit. Danach kein Z3+ mehr bis Rennen.',['Tempo','Speed']),
       mob('m4-2'),
     ]),
     day('2026-05-06','Mi 6. Mai',[
-      run('r4-3','Easy + Power Hike',15,100,'Z1–Z2','Easy mit 35 Min Power Hike. Hike-Gefühl einzementieren.',['Easy','PowerHike']),
+      run('r4-3','Easy Run',10,65,'Z1','Easy. Kein Kraft, kein Tempo. Beine locker halten.',['Easy','Taper']),
       mob('m4-3'),
     ]),
     day('2026-05-07','Do 7. Mai',[
-      run('r4-4','Early Morning – Nacht-Simulation 2',14,92,'Z1–Z2','FRÜHSTART 04:30 UHR. Zweite und letzte Nacht-Simulation. Stirnlampe. Mentale Routine entwickeln. Gear testen: Jacke, Handschuhe, Licht.',['Easy','NachtSimu']),
+      run('r4-4','Early Morning – Nacht-Simulation 2',8,52,'Z1','FRÜHSTART 04:30 UHR. Letzte Nacht-Simulation. Stirnlampe. Mentale Routine einüben. Gear testen: Jacke, Handschuhe, Licht. Sehr locker.',['Easy','NachtSimu','Taper']),
       mob('m4-4'),
     ]),
     day('2026-05-08','Fr 8. Mai',[
-      run('r4-5','Easy Run',12,78,'Z1','Locker. Kein Kraft. Beine frisch halten. HR <140bpm.',['Easy','Taper']),
+      run('r4-5','Easy Run',7,46,'Z1','7km locker. HR <133bpm.',['Easy','Taper']),
       mob('m4-5','Mobility 20 Min (Hüfte + Quad)'),
     ]),
     day('2026-05-09','Sa 9. Mai',[
-      run('r4-6','Uetliberg – Letzter Downhill (locker)',12,85,'Z1–Z2','Letzter Downhill. Locker – kein Tempo. Gear-Check: Schuhe, Socken, Stirnlampe. Gefühl holen. 3–4 Runden max.',['Downhill','Taper']),
+      run('r4-6','Witiker Strecke – Gear Check',8,58,'Z1','1–2 lockere Runden auf der Originalstrecke. Schuhe, Socken, Stirnlampe, Vest checken. Kein Tempo – nur Gefühl und Gear.',['Easy','Taper']),
       mob('m4-6'),
     ]),
     day('2026-05-10','So 10. Mai',[
-      run('r4-7','Easy Run',15,100,'Z1','Sehr locker. Ernährung wie am Renntag. HR <140bpm. Mental ankommen. Kein Kraft, keine Intervalle.',['Easy','Taper','Nutrition-Test']),
+      run('r4-7','Easy Shake-Out',8,52,'Z1','8km sehr locker. Ernährung wie am Renntag (Timing + Produkte). HR <130bpm. Mental ankommen.',['Easy','Taper','Nutrition-Test']),
       mob('m4-7'),
     ]),
   ]},
 
-  {id:5,label:'Race',name:'Race Week',dateRange:'11.–14. Mai',targetKm:24,color:'#FBBF24',phase:'Race',days:[
+  {id:5,label:'Race',name:'Race Week',dateRange:'11.–14. Mai',targetKm:22,color:'#FBBF24',phase:'Race',days:[
     day('2026-05-11','Mo 11. Mai',[
-      run('r5-1','Easy Shake-Out',8,50,'Z1','Locker. HR <135bpm. Crew-Briefing finalisieren. Packliste abhaken.',['Easy','Taper']),
+      run('r5-1','Easy Shake-Out',8,50,'Z1','Locker. HR <130bpm. Crew-Briefing finalisieren. Packliste abhaken.',['Easy','Taper']),
       mob('m5-1','Mobility 20 Min (Hüfte + Waden)'),
     ]),
     day('2026-05-12','Di 12. Mai',[
-      run('r5-2','Easy Shake-Out',8,50,'Z1','8km locker. Gear nochmals tragen – alles sitzt?',['Easy','Taper']),
+      run('r5-2','Easy Shake-Out',8,50,'Z1','8km locker. Gear nochmals tragen – alles sitzt? HR <130bpm.',['Easy','Taper']),
       mob('m5-2','Mobility 15 Min'),
     ]),
     day('2026-05-13','Mi 13. Mai',[
-      run('r5-3','Pre-Race Run',6,38,'Z1','6km. Beine locker halten. Heute: Kohlenhydrate laden, früh schlafen (22:00).',['Easy','Taper']),
+      run('r5-3','Pre-Race Run',6,38,'Z1','6km. Beine locker halten. Heute: Kohlenhydrate laden, früh schlafen (22:00). Kein Stress.',['Easy','Taper']),
       mob('m5-3','Mobility 10 Min (Pre-Race)'),
     ]),
     day('2026-05-14','Do 14. Mai',[race()]),
@@ -663,16 +703,17 @@ function ZonesTab(){
 /* ── OVERVIEW TAB ────────────────────────────────── */
 function OverviewTab({plan}){
   const phases=[
-    {kw:'KW16',name:'Wiedereinstieg',km:70, desc:'Sanfter Einstieg nach Pause. Erst Gefühl, dann Volumen.'},
-    {kw:'KW17',name:'Aufbau I',      km:100,desc:'Erstes B2B. Speed-Intro. Downhill progressiv.'},
-    {kw:'KW18',name:'Peak',          km:130,desc:'Letzte Intensität. Race-Simulation. Nacht-Simulation 1.'},
-    {kw:'KW19',name:'Taper',         km:90, desc:'Volumen runter. Qualität gleich. Nacht-Simulation 2.'},
-    {kw:'Race', name:'Race Week',    km:24, desc:'Shake-Outs. Ernährung. Crew-Briefing. Schlafen.'},
+    {kw:'KW15',name:'Ramp-Up',       km:70,  desc:'Laufende Woche. Downhill Intro Sa, Easy Recovery So.'},
+    {kw:'KW16',name:'Wiedereinstieg',km:90,  desc:'Direkter Wiedereinstieg. 90km, gleiche Basis wie KW15.'},
+    {kw:'KW17',name:'Aufbau I',      km:108, desc:'B2B. Fartlek. Downhill progressiv. +20% von KW16.'},
+    {kw:'KW18',name:'Peak',          km:130, desc:'Letzte Intensität. Witiker Simulation. Nacht-Sim 1. +20% von KW17.'},
+    {kw:'KW19',name:'Taper',         km:65,  desc:'10 Tage Taper. Letzte Speed Di. Ab Mi nur Easy.'},
+    {kw:'Race', name:'Race Week',    km:22,  desc:'Shake-Outs. Ernährung. Crew-Briefing. Schlafen.'},
   ];
   return(
     <div className="fi">
       <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:28,fontWeight:900,marginBottom:4}}>ÜBERSICHT</div>
-      <div style={{fontSize:13,color:'var(--td)',marginBottom:20}}>5 Wochen · 414 km gesamt · Ziel: 62+ Runden</div>
+      <div style={{fontSize:13,color:'var(--td)',marginBottom:20}}>6 Wochen · 485 km gesamt · Ziel: 62+ Runden</div>
       <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:24}}>
         {phases.map((p,i)=>(
           <div key={i} style={{background:'var(--s1)',border:'1px solid var(--border)',borderRadius:10,padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
@@ -688,8 +729,10 @@ function OverviewTab({plan}){
         <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,fontWeight:800,marginBottom:12}}>KERN-ENTSCHEIDUNGEN</div>
         {[
           ['Kein Kraft ab KW18 Di','Kraft A/B/C gestrichen – Regeneration priorisiert in Peak-Woche'],
-          ['Peak bei 130km','Kontrollierbarer Peak. Kein 200km-Risiko 12 Tage vor Rennen'],
-          ['2× Nacht-Simulation','Fr KW18 + Do KW19 – Start 04:30 Uhr, Stirnlampe, Gear-Test'],
+          ['KW16: 90km (Basis wie KW15)','Direkter Wiedereinstieg. Gleiche Last wie vor der Pause.'],
+          ['KW17: 108km (+20%)','Fartlek, B2B, Downhill progressiv auf Uetliberg.'],
+          ['KW18: 130km (+20%, Peak)','Witiker Simulation Sa (5 Runden). Nacht-Simulation Fr.'],
+          ['KW19: 65km (echter Taper)','10 Tage Taper ab Mo. Letzte Speed Di. Ab Mi nur Easy + Shake-outs.'],
           ['Race-Sim Sa KW18','25km / 6–7 Runden, Ernährungstest, Crew-Protokoll'],
           ['Taper-Ende So 22km','Letzter längerer Lauf 4 Tage vor Start. Danach nur Shake-Outs'],
           ['HR-Zonen kalibriert','HRmax 198 – Z2 = 129–158bpm. Alle Einheiten HR-geführt'],
@@ -747,10 +790,15 @@ function App(){
     try{localStorage.setItem('aneo_plan',JSON.stringify(plan));}catch(e){}
   },[plan]);
 
-  // Auto-jump to today's week on first load
+  // Auto-jump to today's week on first load, or next upcoming week
   useEffect(()=>{
     const todayStr=new Date().toISOString().slice(0,10);
-    const idx=plan.findIndex(wk=>wk.days.some(d=>d.date===todayStr));
+    // First try exact match
+    let idx=plan.findIndex(wk=>wk.days.some(d=>d.date===todayStr));
+    // If no exact match, find the week containing the next upcoming day
+    if(idx<0){
+      idx=plan.findIndex(wk=>wk.days.some(d=>d.date>=todayStr));
+    }
     if(idx>=0)setActiveWeek(idx);
   },[]);// eslint-disable-line
 
@@ -849,7 +897,7 @@ function App(){
         </div>
       </div>
 
-      <div style={{maxWidth:900,margin:'0 auto',padding:'18px 16px',paddingBottom:100}}>
+      <div style={{maxWidth:900,margin:'0 auto',padding:'18px 16px',paddingBottom:'max(120px, calc(90px + env(safe-area-inset-bottom)))'}}>
 
         {/* ── PLAN TAB ─────────────────────────────── */}
         {activeTab==='plan'&&(
@@ -919,15 +967,20 @@ function App(){
                 const allDone=d.workouts.filter(w=>w.type!=='mobility').every(w=>completed[w.id]);
                 const todayStr=new Date().toISOString().slice(0,10);
                 const isToday=d.date===todayStr;
+                // Mark next upcoming day if today not in plan
+                const allDates=plan.flatMap(wk=>wk.days.map(dd=>dd.date));
+                const hasToday=allDates.includes(todayStr);
+                const isNextUp=!hasToday && d.date===allDates.filter(dt=>dt>=todayStr).sort()[0];
 
+                const highlight=isToday||isNextUp;
                 return(
                   <div key={d.date}
                     className={`day-card drop-zone${isOver?' over':''}`}
                     style={{
-                      borderColor: isOver?'#F97316': isToday?'#F97316': allDone?'rgba(249,115,22,.3)':'var(--border)',
-                      borderWidth: isToday?2:1,
-                      background: isToday?'rgba(249,115,22,.07)':'var(--s1)',
-                      animation: isToday?'todayPulse 2.5s ease-in-out infinite':'none',
+                      borderColor: isOver?'#F97316': highlight?'#F97316': allDone?'rgba(249,115,22,.3)':'var(--border)',
+                      borderWidth: highlight?2:1,
+                      background: highlight?'rgba(249,115,22,.07)':'var(--s1)',
+                      animation: highlight?'todayPulse 2.5s ease-in-out infinite':'none',
                     }}
                     onDragOver={e=>handleDragOver(d.date,e)}
                     onDrop={e=>handleDrop(d.date,week.id,e)}
@@ -935,11 +988,12 @@ function App(){
                   >
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
                       <div style={{display:'flex',alignItems:'center',gap:7}}>
-                        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:15,fontWeight:700,color:isToday?'#F97316':'var(--td)',letterSpacing:'.05em',textTransform:'uppercase'}}>{d.label}</div>
+                        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:15,fontWeight:700,color:highlight?'#F97316':'var(--td)',letterSpacing:'.05em',textTransform:'uppercase'}}>{d.label}</div>
                         {isToday&&<span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:800,letterSpacing:'.08em',background:'#F97316',color:'#070809',padding:'2px 7px',borderRadius:3}}>HEUTE</span>}
+                        {isNextUp&&<span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:800,letterSpacing:'.08em',background:'#F97316',color:'#070809',padding:'2px 7px',borderRadius:3}}>NÄCHSTER TAG</span>}
                       </div>
-                      {allDone&&!isToday&&<span style={{fontSize:12,color:'#F97316',fontWeight:700}}>✓</span>}
-                      {allDone&&isToday&&<span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:800,color:'#F97316'}}>✓ DONE</span>}
+                      {allDone&&!highlight&&<span style={{fontSize:12,color:'#F97316',fontWeight:700}}>✓</span>}
+                      {allDone&&highlight&&<span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:800,color:'#F97316'}}>✓ DONE</span>}
                     </div>
                     <div style={{display:'flex',flexDirection:'column',gap:8}}>
                       {d.workouts.map(wo=>{
