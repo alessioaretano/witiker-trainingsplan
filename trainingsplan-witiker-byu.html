@@ -22,11 +22,11 @@
   <style>
     :root {
       --bg: #000000;
-      --surface: #0D0D0D;
-      --card: #141414;
-      --card2: #1C1C1C;
+      --surface-1: #0D0D0D;
+      --surface-2: #141414;
+      --surface-3: #1C1C1C;
       --border: #1E1E1E;
-      --border2: #2A2A2A;
+      --border-accent: #2A2A2A;
       --text: #F0E6D8;
       --dim: #52493E;
       --mid: #8A7E70;
@@ -35,157 +35,398 @@
       --sage: #00E699;
       --blush: #FF1A75;
       --gold: #FFC000;
-      --top: 52px;
-      --bot: 64px;
+      --cloud: #F0E6D8;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
-    
-    /* App-like Layout */
-    .app-container { position: fixed; inset: 0; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-    .top-bar { height: var(--top); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 100; }
-    .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: var(--bot); }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(var(--bot) + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
-    
-    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: none; color: var(--dim); cursor: pointer; transition: color .15s; }
-    .nav-btn.active { color: var(--cream); }
-    .nav-icon { font-size: 20px; }
-    .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
-
-    /* Cards & UI Elements */
-    .card { background: var(--card); border: 1px solid var(--border2); border-radius: 16px; padding: 16px; margin: 12px 16px; }
-    .tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body { 
+      background: var(--bg); 
+      color: var(--text); 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; 
+      min-height: 100vh; 
+      -webkit-font-smoothing: antialiased; 
+      padding-bottom: env(safe-area-inset-bottom);
+    }
     
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(240,230,216,0.1); border-radius: 2px; }
 
-    /* Modals */
-    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
-    .modal-sheet { background: var(--surface); border: 1px solid var(--border2); border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom); }
+    .tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; white-space: nowrap; }
     
-    .aneo-logo { font-family: Georgia, serif; font-size: 18px; font-weight: 700; color: var(--cream); }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+    @media (min-width: 640px) { .modal-bg { align-items: center; padding: 16px; } }
+    .modal-sheet { background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px 24px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; }
+    @media (min-width: 640px) { .modal-sheet { max-width: 640px; border-radius: 24px; } }
+    
+    .pill { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: opacity 0.15s; user-select: none; -webkit-user-select: none; background: var(--surface-2); border: 1px solid var(--border); }
+    .pill:active { opacity: 0.7; }
+    
+    .week-tab { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+    .week-tab.active { background: var(--cream); color: #000; }
+    .week-tab:not(.active) { color: var(--mid); border-color: transparent; }
+    .week-tab:not(.active):hover { color: var(--cream); background: var(--surface-2); }
+    
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-1); border-top: 1px solid var(--border); z-index: 40; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); display: flex; }
+    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; color: var(--dim); }
+    .bottom-nav-item.active { color: var(--cream); }
+    .bottom-nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+    
+    .exercise-row { border-bottom: 1px solid var(--border); }
+    .exercise-row:last-child { border-bottom: none; }
+    
+    .aneo-logo { font-family: Georgia, serif; font-size: 18px; font-weight: 700; color: var(--cream); letter-spacing: -0.02em; }
     .aneo-logo span { color: var(--blue); }
+    
+    @media (max-width: 639px) { .desktop-only { display: none !important; } }
+    @media (min-width: 640px) { .mobile-only { display: none !important; } .bottom-nav { display: none !important; } }
+    
+    /* Custom styles for the Witiker Plan content */
+    .card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+    .section-title { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useMemo } = React;
+const { useState, useCallback, useMemo, useRef, useEffect } = React;
 
-// --- CONFIG & DATA ---
+// ── BRAND COLORS ──────────────────────────────────
 const C = {
-  blue: '#3377FF', sage: '#00E699', blush: '#FF1A75', gold: '#FFC000', cream: '#F0E6D8'
+  blue:  '#3377FF', blueDim:  'rgba(51,119,255,0.15)',  blueBorder: 'rgba(51,119,255,0.4)',
+  sage:  '#00E699', sageDim:  'rgba(0,230,153,0.15)',   sageBorder: 'rgba(0,230,153,0.4)',
+  blush: '#FF1A75', blushDim: 'rgba(255,26,117,0.15)',   blushBorder:'rgba(255,26,117,0.4)',
+  gold:  '#FFC000', goldDim:  'rgba(255,192,0,0.15)',   goldBorder: 'rgba(255,192,0,0.4)',
+  cloud: '#F0E6D8',
 };
 
+const RACE_DATE = new Date('2026-05-14T12:00:00');
+
+// ── MOBILITY DATA ─────────────────────────────────
+const MOBILITY_ROUTINE = [
+  { id:'mob-1', icon:'🔄', name:'Hip 90/90 – Aktive Rotation', dur:'2 × 60s je Seite', focus:'Hüftaußen-/innenrotation', desc:'90/90-Position: beide Knie im rechten Winkel. Oberkörper aktiv über das vordere Knie rotieren, dann zur anderen Seite. Hüfte bleibt am Boden.', cues:['Hüfte gedrückt halten','Aktiv drücken, nicht fallen','Bei Rotation ausatmen'], url:'https://www.youtube.com/results?search_query=hip+90+90+active+rotation+mobility' },
+  { id:'mob-2', icon:'🕊️', name:'Pigeon Pose (Taube)', dur:'90s je Seite', focus:'Gluteus, Hüftaußenrotator', desc:'Vorderes Bein im 90°-Winkel. Oberkörper nach vorne. Tief in die Dehnung atmen und bewusst loslassen.', cues:['Hüfte gerade ausrichten','Nicht zur Seite kippen','Durch tiefes Atmen entspannen'], url:'https://www.youtube.com/results?search_query=pigeon+pose+hip+flexibility' },
+  { id:'mob-3', icon:'⬇️', name:'Deep Squat Hold', dur:'2 × 60s', focus:'Hüftflexoren, Sprunggelenk, Adduktoren', desc:'Tiefer Squat, Fersen am Boden. Ellbogen drücken Knie sanft nach außen. Rücken aufrecht. Bei Bedarf Türrahmen zur Unterstützung.', cues:['Fersen am Boden','Knie nach außen','Brust aufrecht'], url:'https://www.youtube.com/results?search_query=deep+squat+hold+hip+mobility' },
+  { id:'mob-4', icon:'🌍', name:"World's Greatest Stretch", dur:'5 × je Seite', focus:'Hüftbeuger, Thorax, Rotation', desc:'Ausfallschritt: Hand auf Boden neben Vorderfuss. Arm nach oben aufdrehen. Dann Ellbogen zum Boden. Eine der effektivsten Übungen für Läufer.', cues:['Hüfte sinkt nach unten','Arm wirklich weit aufmachen','3s pro Position'], url:'https://www.youtube.com/results?search_query=worlds+greatest+stretch' },
+  { id:'mob-5', icon:'⭕', name:'Stehende Hüftkreise (Balance Board)', dur:'2 × 10 je Richtung/Bein', focus:'Hüftmobilität, Propriozeption', desc:'Einbeinig stehen (Balance Board empfohlen). Anderes Bein macht große, kontrollierte Kreise. Rumpf stabil halten.', cues:['Großer Kreis','Stützfuss stabil','Balance Board = höherer Reiz'], url:'https://www.youtube.com/results?search_query=standing+hip+circles+balance' },
+  { id:'mob-6', icon:'🛋️', name:'Supine Glute Stretch (Figure 4)', dur:'60s je Seite', focus:'Gluteus, Piriformis', desc:'Auf dem Rücken. Knöchel auf das andere Knie. Bein zur Brust ziehen. Variation: Bein an Wand für passive Version.', cues:['Fuss flexieren','Tief in die Dehnung','Variation: Wand nutzen'], url:'https://www.youtube.com/results?search_query=figure+four+supine+glute+stretch' },
+];
+
+// ── EXERCISE DATA ─────────────────────────────────
+const EX = {
+  'hip-thrust-sl':   { n:'Hip Thrust (Einbeinig)',          cat:'A', m:'Gluteus Max, Hamstrings',       s:'3×10 je Seite',  i:'🍑', load:'KG → Barbell', d:'Schultern auf Bank (~40cm). Fuss mittig unter Knie. Hüfte explosiv nach oben bis Körperlinie gerade. 1–2s oben halten.', cues:['Kinn zur Brust','Fuss unter Knie','Gluteus oben pressen'], warn:'Knie: Fuss nicht zu weit vorne', url:'https://www.youtube.com/results?search_query=single+leg+hip+thrust' },
+  'bulgarian-split': { n:'Bulgarischer Split Squat',         cat:'A', m:'Quadrizeps, Gluteus, Balance',  s:'3×10 je Seite',  i:'🦵', load:'KG → Kurzhanteln', d:'Hinterer Fuss auf Bank. 80% Gewicht auf vorderem Fuss. Kontrolliert absenken, Knie über 2. Zeh.', cues:['Knie nicht nach innen','Ferse drücken','3s absenken'], url:'https://www.youtube.com/results?search_query=bulgarian+split+squat+form' },
+  'tibialis-raise':  { n:'Tibialis Raises',                  cat:'A', m:'Tibialis anterior',             s:'3×20',           i:'🦴', load:'KG → Gewichtsmanschette', d:'Rücken an Wand, Fersen 25–30cm vor der Wand. Zehen maximal nach oben – kontrolliert senken. Es brennt – das ist richtig.', cues:['2s hoch / 3s runter','Volle Amplitude','Brennen = korrekt'], note:'✅ Präventiv gegen Shin Splints', url:'https://www.youtube.com/results?search_query=tibialis+raise+knees+over+toes' },
+  'copenhagen-plank':{ n:'Copenhagen Plank',                 cat:'A', m:'Adduktoren, Hüftstabi, Core',  s:'3×30s je Seite', i:'📐', load:'Körpergewicht', d:'Seitlich auf dem Boden, oberer Fuss auf erhöhter Fläche (~40cm). Hüfte hochhalten, Körperlinie gerade. Kein Rotieren.', cues:['Hüfte nicht durchhängen','Aktiv hochdrücken','Rumpf fest'], note:'✅ Adduktoren + Kniestabilität', url:'https://www.youtube.com/results?search_query=copenhagen+plank+tutorial' },
+  'step-up-knee':    { n:'Step-Up mit Kniehub',              cat:'A', m:'Quadrizeps, Glute med, Balance',s:'3×12 je Seite',  i:'📦', load:'KG → Hanteln', d:'Box ~40–50cm. Fuss komplett auf Box. Hochdrücken, Knie der Schwungseite bis Hüfthöhe heben. 3s absenken.', cues:['Durch Ferse drücken','Knie über 2. Zeh','Langsam absenken'], url:'https://www.youtube.com/results?search_query=step+up+knee+drive' },
+  'lateral-band-walk':{ n:'Lateral Band Walk',               cat:'A', m:'Gluteus Medius, Hüftstabi',     s:'3×15 je Seite',  i:'🦀', load:'Miniband (Knie/Knöchel)', d:'Leichte Squat-Position. Band um Knie oder Knöchel. Seitliche Schritte, Spannung halten. Oberkörper ruhig.', cues:['Spannung im Band','Knie nicht kollabieren','Rumpf stabil'], url:'https://www.youtube.com/results?search_query=lateral+band+walk+glute+activation' },
+  'calf-raise-sl':   { n:'Wadenheben (Einbeinig)',           cat:'A', m:'Gastrocnemius, Soleus',         s:'3×15 je Seite',  i:'🦶', load:'KG → Hantel', d:'Auf Stufe stehen. Ferse tief absenken, dann explosiv auf Zehenspitzen. 2s halten. 3s absenken.', cues:['Volle Dehnung unten','Kurz halten oben','Kontrolliert ab'], url:'https://www.youtube.com/results?search_query=single+leg+calf+raise' },
+  'dead-bug':        { n:'Dead Bug (Anti-Extension)',        cat:'B', m:'Deep Core, Rumpfstabilität',    s:'3×12 alternierend',i:'🐜', load:'Körpergewicht', d:'Rücken flach am Boden (kein Hohlkreuz!). Arme/Beine hoch. Diagonal Arm/Bein senken, Rumpf stabil halten.', cues:['Rücken am Boden pressen','Langsame Bewegung','Ausatmen beim Senken'], url:'https://www.youtube.com/results?search_query=dead+bug+exercise+core' },
+  'side-plank-leg':  { n:'Side Plank + Leg Lift',            cat:'B', m:'Obliques, Glute Medius',        s:'3×45s je Seite', i:'🧗', load:'Körpergewicht', d:'Seitstütz auf Ellbogen. Oberes Bein gestreckt heben und senken. Hüfte bleibt oben und stabil.', cues:['Hüfte hoch','Bein kontrolliert heben','Nicht nach vorne kippen'], url:'https://www.youtube.com/results?search_query=side+plank+with+leg+lift' },
+  'bird-dog':        { n:'Bird Dog',                         cat:'B', m:'Rückenstrecker, Core, Balance', s:'3×12 alternierend',i:'🐕', load:'Körpergewicht', d:'Vierfüßlerstand. Diagonal Arm/Bein strecken. 2s halten. Keine Rotation in der Hüfte.', cues:['Hüfte parallel zum Boden','Daumen nach oben','Bauch fest'], url:'https://www.youtube.com/results?search_query=bird+dog+exercise+form' },
+  'hollow-body':     { n:'Hollow Body Hold',                 cat:'B', m:'Gesamter Core',                 s:'3×30-45s',       i:'🍌', load:'Körpergewicht', d:'Rücken flach am Boden. Beine und Schultern leicht heben. Arme nach hinten. Spannung im ganzen Körper.', cues:['Lendenwirbelsäule am Boden','Beine so tief wie möglich','Atmen nicht vergessen'], url:'https://www.youtube.com/results?search_query=hollow+body+hold+progression' },
+  'plank-shoulder':  { n:'Plank Shoulder Taps',               cat:'B', m:'Core-Stabilität (Anti-Rotation)',s:'3×20 Taps',      i:'🤝', load:'Körpergewicht', d:'Liegestütz-Position. Abwechselnd Hand zur gegenüberliegenden Schulter. Hüfte darf nicht wackeln.', cues:['Hüfte fixieren','Füsse breiter für Stabi','Ruhige Bewegung'], url:'https://www.youtube.com/results?search_query=plank+shoulder+taps' },
+  'pallof-press':    { n:'Pallof Press',                     cat:'B', m:'Anti-Rotation Core',            s:'3×12 je Seite',  i:'🏹', load:'Widerstandsband', d:'Seitlich zum Band stehen. Band vor der Brust halten, gerade nach vorne drücken und halten. Band will dich drehen – widerstehe.', cues:['Schultern tief','Fest stehen','Gegen Rotation arbeiten'], url:'https://www.youtube.com/results?search_query=pallof+press+band' },
+  'superman-hold':   { n:'Superman Holds',                   cat:'C', m:'Rückenstrecker, Gluteus',       s:'3×12 (3s halten)',i:'🦸', load:'Körpergewicht', d:'Bauchlage. Arme und Beine gleichzeitig heben. 3s halten, Blick zum Boden. Fokus auf unteren Rücken.', cues:['Nicht überstrecken','Gluteus anspannen','Blick nach unten'], url:'https://www.youtube.com/results?search_query=superman+exercise+back' },
+  'glute-bridge':    { n:'Glute Bridge (Beidbeinig)',        cat:'C', m:'Gluteus, Hamstrings',           s:'3×20',           i:'🌉', load:'KG → Miniband', d:'Rückenlage, Füsse aufgestellt. Hüfte hochdrücken, oben Gluteus maximal anspannen. 2s halten.', cues:['Fersen drücken','Oben halten','Knie stabil'], url:'https://www.youtube.com/results?search_query=glute+bridge+form' },
+  'cat-cow':         { n:'Cat-Cow (Mobilisation)',           cat:'C', m:'Wirbelsäule',                   s:'2×15',           i:'🐈', load:'Körpergewicht', d:'Vierfüßlerstand. Rücken rund machen (Katze), dann kontrolliert ins leichte Hohlkreuz (Kuh). Wirbel für Wirbel.', cues:['Mit Atmung koppeln','Langsam','Volle Amplitude'], url:'https://www.youtube.com/results?search_query=cat+cow+stretch' },
+};
+
+const ST = {
+  'A': { name:'Kraft A (Power)', color:C.sage, focus:'Beinkraft & Stabilität', dur:'~45 min', routine:['hip-thrust-sl','bulgarian-split','tibialis-raise','copenhagen-plank','step-up-knee','lateral-band-walk','calf-raise-sl'] },
+  'B': { name:'Kraft B (Core)',  color:C.blue, focus:'Rumpfstabilität & Anti-Rotation', dur:'~35 min', routine:['dead-bug','side-plank-leg','bird-dog','hollow-body','plank-shoulder','pallof-press'] },
+  'C': { name:'Kraft C (Recovery)',color:C.blush, focus:'Prävention & Mobilisation', dur:'~25 min', routine:['superman-hold','glute-bridge','cat-cow','tibialis-raise','lateral-band-walk'] },
+};
+
+// ── WORKOUT DATA ──────────────────────────────────
 const INITIAL_PLAN = [
-  { id: 'w1', label: 'Woche 1', name: 'Base Building', days: [
-    { date: '2026-04-13', label: 'Mo', workouts: [{ id: 'r1', type: 'run', title: 'Easy Run', km: 8, duration: 45, hr: 'Z2', description: 'Lockerer Dauerlauf im Wohlfühltempo.' }] },
-    { date: '2026-04-14', label: 'Di', workouts: [{ id: 's1', type: 'strength', routineKey: 'A' }] },
-    { date: '2026-04-15', label: 'Mi', workouts: [{ id: 'r2', type: 'run', title: 'Intervalle', km: 10, duration: 55, hr: 'Z4', description: '4 x 1km @ 4:15 min/km, 2min Trabpause.' }] },
-    { date: '2026-04-16', label: 'Do', workouts: [] },
-    { date: '2026-04-17', label: 'Fr', workouts: [{ id: 'r3', type: 'run', title: 'Easy Run', km: 6, duration: 35, hr: 'Z2', description: 'Kurzer Erholungslauf.' }] },
-    { date: '2026-04-18', label: 'Sa', workouts: [{ id: 'r4', type: 'run', title: 'Long Run', km: 18, duration: 100, hr: 'Z2', description: 'Langer Lauf, Fokus auf Fettstoffwechsel.' }] },
-    { date: '2026-04-19', label: 'So', workouts: [] }
+  { id:'w1', label:'Woche 1', name:'Einstieg & Rhythmus', days:[
+    { date:'2026-04-13', label:'Mo', workouts:[{ id:'r1', type:'run', title:'Easy Run', km:8, duration:45, hr:'Z2 (135-145)', description:'Lockerer Dauerlauf zum Einstieg. Fokus auf saubere Technik und niedrigen Puls.', tags:['Z2','Technik'] }] },
+    { date:'2026-04-14', label:'Di', workouts:[{ id:'s1', type:'strength', routineKey:'A' }] },
+    { date:'2026-04-15', label:'Mi', workouts:[{ id:'r2', type:'run', title:'Intervalle (Kurz)', km:10, duration:55, hr:'Z4 (165-175)', description:'Warm-up 15min. Dann 8 x 400m @ 3:50-4:00 min/km mit 200m Trabpause. Cool-down 10min.', tags:['Z4','Speed'] }] },
+    { date:'2026-04-16', label:'Do', workouts:[{ id:'m1', type:'mobility' }] },
+    { date:'2026-04-17', label:'Fr', workouts:[{ id:'r3', type:'run', title:'Easy Run + Strides', km:7, duration:40, hr:'Z2 (135-145)', description:'Lockerer Lauf, am Ende 4 x 80m Steigerungen (Strides) zur Aktivierung.', tags:['Z2','Strides'] }] },
+    { date:'2026-04-18', label:'Sa', workouts:[{ id:'r4', type:'run', title:'Long Run (Base)', km:16, duration:95, hr:'Z2 (135-145)', description:'Langer, entspannter Lauf. Verpflegung testen (Wasser/Elektrolyte).', tags:['Z2','Endurance'] }] },
+    { date:'2026-04-19', label:'So', workouts:[{ id:'s2', type:'strength', routineKey:'C' }] },
+  ]},
+  { id:'w2', label:'Woche 2', name:'Umfangsteigerung', days:[
+    { date:'2026-04-20', label:'Mo', workouts:[{ id:'r5', type:'run', title:'Easy Run', km:10, duration:55, hr:'Z2', description:'Lockerer Dauerlauf.', tags:['Z2'] }] },
+    { date:'2026-04-21', label:'Di', workouts:[{ id:'s3', type:'strength', routineKey:'A' }] },
+    { date:'2026-04-22', label:'Mi', workouts:[{ id:'r6', type:'run', title:'Tempo-Dauerlauf', km:12, duration:65, hr:'Z3 (155-165)', description:'Warm-up 10min. 6km @ 4:45 min/km (Z3). Cool-down 10min.', tags:['Z3','Tempo'] }] },
+    { date:'2026-04-23', label:'Do', workouts:[{ id:'m2', type:'mobility' }] },
+    { date:'2026-04-24', label:'Fr', workouts:[{ id:'r7', type:'run', title:'Easy Run', km:8, duration:45, hr:'Z2', description:'Lockerer Lauf.', tags:['Z2'] }] },
+    { date:'2026-04-25', label:'Sa', workouts:[{ id:'r8', type:'run', title:'Long Run (Progressiv)', km:20, duration:115, hr:'Z2 -> Z3', description:'15km Z2, letzte 5km in Z3 (Marathontempo-Feeling).', tags:['Z2','Z3','Endurance'] }] },
+    { date:'2026-04-26', label:'So', workouts:[{ id:'s4', type:'strength', routineKey:'B' }] },
+  ]},
+  { id:'w3', label:'Woche 3', name:'Peak & Intensität', days:[
+    { date:'2026-04-27', label:'Mo', workouts:[{ id:'r9', type:'run', title:'Easy Run', km:10, duration:55, hr:'Z2', description:'Lockerer Dauerlauf.', tags:['Z2'] }] },
+    { date:'2026-04-28', label:'Di', workouts:[{ id:'s5', type:'strength', routineKey:'A' }] },
+    { date:'2026-04-29', label:'Mi', workouts:[{ id:'r10', type:'run', title:'Intervalle (Lang)', km:14, duration:75, hr:'Z4', description:'Warm-up 15min. 4 x 2000m @ 4:20 min/km mit 400m Trabpause. Cool-down 15min.', tags:['Z4','Speed'] }] },
+    { date:'2026-04-30', label:'Do', workouts:[{ id:'m3', type:'mobility' }] },
+    { date:'2026-05-01', label:'Fr', workouts:[{ id:'r11', type:'run', title:'Easy Run', km:8, duration:45, hr:'Z2', description:'Lockerer Lauf.', tags:['Z2'] }] },
+    { date:'2026-05-02', label:'Sa', workouts:[{ id:'r12', type:'run', title:'Long Run (Peak)', km:24, duration:140, hr:'Z2', description:'Längster Lauf des Plans. Fokus auf mentale Stärke und Fettstoffwechsel.', tags:['Z2','Endurance'] }] },
+    { date:'2026-05-03', label:'So', workouts:[{ id:'s6', type:'strength', routineKey:'B' }] },
+  ]},
+  { id:'w4', label:'Woche 4', name:'Tapering & Race Prep', days:[
+    { date:'2026-05-04', label:'Mo', workouts:[{ id:'r13', type:'run', title:'Easy Run', km:8, duration:45, hr:'Z2', description:'Umfang reduzieren, Beine locker halten.', tags:['Z2','Tapering'] }] },
+    { date:'2026-05-05', label:'Di', workouts:[{ id:'s7', type:'strength', routineKey:'C' }] },
+    { date:'2026-05-06', label:'Mi', workouts:[{ id:'r14', type:'run', title:'Race Pace Check', km:8, duration:45, hr:'Z3', description:'Warm-up 10min. 3km @ Race Pace. Cool-down 10min.', tags:['Z3','RacePace'] }] },
+    { date:'2026-05-07', label:'Do', workouts:[{ id:'m4', type:'mobility' }] },
+    { date:'2026-05-08', label:'Fr', workouts:[{ id:'r15', type:'run', title:'Shakeout Run', km:5, duration:30, hr:'Z1/Z2', description:'Ganz lockeres Traben.', tags:['Z1','Z2'] }] },
+    { date:'2026-05-09', label:'Sa', workouts:[{ id:'r16', type:'run', title:'Long Run (Short)', km:12, duration:70, hr:'Z2', description:'Kurzer Long Run zur Erhaltung.', tags:['Z2'] }] },
+    { date:'2026-05-10', label:'So', workouts:[{ id:'s8', type:'strength', routineKey:'C' }] },
+  ]},
+  { id:'w5', label:'Woche 5', name:'Race Week', days:[
+    { date:'2026-05-11', label:'Mo', workouts:[{ id:'r17', type:'run', title:'Easy Run', km:6, duration:35, hr:'Z2', description:'Nur noch locker bewegen.', tags:['Z2'] }] },
+    { date:'2026-05-12', label:'Di', workouts:[{ id:'m5', type:'mobility' }] },
+    { date:'2026-05-13', label:'Mi', workouts:[{ id:'r18', type:'run', title:'Shakeout + Strides', km:4, duration:25, hr:'Z1', description:'Ganz kurz, 2-3 lockere Steigerungen.', tags:['Z1','Strides'] }] },
+    { date:'2026-05-14', label:'Do', workouts:[{ id:'race', type:'run', title:'BYU WITIKON RACE DAY', km:100, duration:0, hr:'MAX', description:'Showtime! Schweizer Rekord Jagd.', tags:['RACE','GO'] }] },
+    { date:'2026-05-15', label:'Fr', workouts:[] },
+    { date:'2026-05-16', label:'Sa', workouts:[] },
+    { date:'2026-05-17', label:'So', workouts:[] },
   ]}
 ];
 
-const ST = {
-  'A': { name: 'Kraft A', color: C.sage, focus: 'Core & Stability', dur: '30 min' },
-  'B': { name: 'Kraft B', color: C.blue, focus: 'Leg Power', dur: '40 min' }
-};
+// ── COMPONENTS ────────────────────────────────────
 
-// --- COMPONENTS ---
-function App() {
-  const [activeTab, setActiveTab] = useState('plan');
-  const [plan, setPlan] = useState(INITIAL_PLAN);
-  const [selectedWorkout, setSelectedWorkout] = useState(null);
+function Tag({t}) {
+  const colors = {
+    'Z2': { bg:C.blueDim, text:C.blue, border:C.blueBorder },
+    'Z3': { bg:C.goldDim, text:C.gold, border:C.goldBorder },
+    'Z4': { bg:C.blushDim, text:C.blush, border:C.blushBorder },
+    'RACE': { bg:C.blush, text:'#fff', border:C.blush },
+    'Strength': { bg:C.sageDim, text:C.sage, border:C.sageBorder },
+  };
+  const s = colors[t] || { bg:'rgba(240,230,216,0.05)', text:C.mid, border:'rgba(240,230,216,0.1)' };
+  return <span className="tag" style={{ background:s.bg, color:s.text, border:`1px solid ${s.border}` }}>{t}</span>;
+}
 
+function ExCard({exId}) {
+  const ex = EX[exId];
+  const [open, setOpen] = useState(false);
+  if(!ex) return null;
+  const catColor = {A:C.sage,B:C.blue,C:C.blush}[ex.cat]||C.blue;
   return (
-    <div className="app-container">
-      <header className="top-bar">
-        <div className="aneo-logo">ANEO<span>.</span></div>
-        <div style={{textAlign:'right'}}>
-          <div style={{fontSize:16, fontWeight:700, color:C.cream}}>Witiker Plan</div>
-          <div style={{fontSize:10, color:'var(--dim)', textTransform:'uppercase'}}>Training Journey</div>
+    <div className="exercise-row" style={{padding:'12px 0'}}>
+      <button style={{display:'flex', alignItems:'center', gap:12, width:'100%', background:'none', border:'none', cursor:'pointer', color:'inherit', textAlign:'left'}} onClick={()=>setOpen(!open)}>
+        <span style={{fontSize:20, flexShrink:0}}>{ex.i}</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14, fontWeight:700, color:C.cloud}}>{ex.n}</div>
+          <div style={{fontSize:12, color:var(--dim), marginTop:2}}>{ex.m} · <span style={{color:catColor, fontWeight:600}}>{ex.s}</span></div>
         </div>
-      </header>
+        <span style={{color:var(--dim), fontSize:12, flexShrink:0}}>{open?'▲':'▼'}</span>
+      </button>
+      {open && (
+        <div style={{marginTop:12, paddingLeft:32, display:'flex', flexDirection:'column', gap:10}}>
+          <p style={{fontSize:13, color:var(--mid), lineHeight:1.6}}>{ex.d}</p>
+          {ex.cues && <div style={{display:'flex', flexDirection:'column', gap:4}}>
+            {ex.cues.map((c,i)=><div key={i} style={{fontSize:12, color:var(--dim), display:'flex', gap:8}}><span style={{color:catColor,flexShrink:0}}>→</span>{c}</div>)}
+          </div>}
+          <a href={ex.url} target="_blank" rel="noopener noreferrer"
+            style={{display:'inline-flex', alignItems:'center', gap:6, fontSize:12, color:C.blush, background:C.blushDim, padding:'6px 12px', borderRadius:8, textDecoration:'none', width:'fit-content', border:`1px solid ${C.blushBorder}`}}>
+            ▶ YouTube Demo
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
 
-      <main className="content">
-        {activeTab === 'plan' && (
-          <div style={{paddingTop:8}}>
-            {plan.map(week => (
-              <div key={week.id}>
-                <div style={{padding:'16px 16px 4px', fontSize:11, fontWeight:700, color:'var(--dim)', textTransform:'uppercase', letterSpacing:'.1em'}}>
-                  {week.label} · {week.name}
-                </div>
-                {week.days.map(day => (
-                  <div key={day.date} className="card" style={{margin:'8px 16px', display:'flex', alignItems:'center', gap:16}}>
-                    <div style={{width:32, textAlign:'center'}}>
-                      <div style={{fontSize:10, color:'var(--dim)', textTransform:'uppercase'}}>{day.label}</div>
-                      <div style={{fontSize:16, fontWeight:800}}>{day.date.split('-')[2]}</div>
-                    </div>
-                    <div style={{flex:1, display:'flex', flexDirection:'column', gap:6}}>
-                      {day.workouts.length === 0 ? (
-                        <div style={{fontSize:13, color:'var(--dim)', fontStyle:'italic'}}>Rest Day</div>
-                      ) : (
-                        day.workouts.map(w => (
-                          <div key={w.id} onClick={() => setSelectedWorkout({w, day})} style={{cursor:'pointer'}}>
-                            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                              <span style={{fontSize:14, fontWeight:700}}>{w.title || (w.type === 'strength' ? ST[w.routineKey].name : 'Lauf')}</span>
-                              {w.km && <span style={{fontSize:12, color:C.blue, fontWeight:700}}>{w.km}km</span>}
-                            </div>
-                            <div style={{fontSize:11, color:'var(--mid)'}}>
-                              {w.type === 'run' ? `${w.duration}min · ${w.hr}` : `${ST[w.routineKey].focus}`}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ))}
+function RunModal({workout, day, onClose}) {
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()}>
+        <div style={{width:36, height:4, background:'var(--border-accent)', borderRadius:2, margin:'12px auto 20px'}} />
+        <div style={{padding:'0 20px 32px'}}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8}}>
+            <div>
+              <h2 style={{fontSize:20, fontWeight:800, color:C.cloud}}>{workout.title}</h2>
+              <p style={{fontSize:13, color:var(--dim)}}>{day?.label}, {day?.date}</p>
+            </div>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:var(--mid), width:32, height:32, borderRadius:50, cursor:'pointer', fontSize:18}}>×</button>
+          </div>
+          <div style={{display:'flex', flexWrap:'wrap', gap:6, marginBottom:20}}>
+            {workout.tags?.map(t=><Tag key={t} t={t}/>)}
+          </div>
+          <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, marginBottom:20}}>
+            {[
+              { label:'Distanz', val:workout.km, unit:'km', color:C.blue },
+              { label:'Dauer', val:workout.duration, unit:'min', color:C.sage },
+              { label:'Intensität', val:workout.hr, unit:'', color:C.blush }
+            ].map(m => (
+              <div key={m.label} style={{background:'var(--surface-2)', borderRadius:12, padding:'12px 8px', textAlign:'center', border:'1px solid var(--border)'}}>
+                <div style={{fontSize:10, color:var(--dim), fontWeight:700, textTransform:'uppercase', marginBottom:4}}>{m.label}</div>
+                <div style={{fontSize:18, fontWeight:800, color:m.color}}>{m.val}<span style={{fontSize:11, marginLeft:2, opacity:0.6}}>{m.unit}</span></div>
               </div>
             ))}
           </div>
-        )}
-        {activeTab === 'stats' && <div style={{padding:40, textAlign:'center', color:'var(--dim)'}}>Statistiken kommen bald...</div>}
-      </main>
-
-      <nav className="bottom-nav">
-        <button className={`nav-btn ${activeTab === 'plan' ? 'active' : ''}`} onClick={() => setActiveTab('plan')}>
-          <span className="nav-icon">📅</span>
-          <span className="nav-label">Plan</span>
-        </button>
-        <button className={`nav-btn ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
-          <span className="nav-icon">📊</span>
-          <span className="nav-label">Stats</span>
-        </button>
-        <button className="nav-btn">
-          <span className="nav-icon">👤</span>
-          <span className="nav-label">Profil</span>
-        </button>
-      </nav>
-
-      {selectedWorkout && (
-        <div className="modal-bg" onClick={() => setSelectedWorkout(null)}>
-          <div className="modal-sheet" onClick={e => e.stopPropagation()}>
-            <div style={{width:36, height:4, background:'var(--border2)', borderRadius:2, margin:'12px auto 20px'}} />
-            <div style={{padding:'0 20px 32px'}}>
-              <h2 style={{fontSize:20, fontWeight:800, marginBottom:4}}>{selectedWorkout.w.title || (selectedWorkout.w.type === 'strength' ? ST[selectedWorkout.w.routineKey].name : 'Workout')}</h2>
-              <p style={{fontSize:13, color:'var(--mid)', marginBottom:20}}>{selectedWorkout.day.label}, {selectedWorkout.day.date}</p>
-              
-              <div style={{background:'var(--card)', borderRadius:12, padding:16, border:'1px solid var(--border2)', marginBottom:16}}>
-                <div style={{fontSize:11, fontWeight:700, color:'var(--dim)', textTransform:'uppercase', marginBottom:8}}>Details</div>
-                <p style={{fontSize:15, lineHeight:1.6, color:'var(--text)'}}>{selectedWorkout.w.description || 'Keine Beschreibung verfügbar.'}</p>
-              </div>
-              
-              <button onClick={() => setSelectedWorkout(null)} style={{width:'100%', padding:16, borderRadius:12, background:C.blue, color:'#fff', fontWeight:700, border:'none'}}>Schliessen</button>
-            </div>
+          <div className="card">
+            <div className="section-title">Beschreibung</div>
+            <p style={{fontSize:15, color:var(--text), lineHeight:1.6}}>{workout.description}</p>
           </div>
+          <button onClick={onClose} style={{width:'100%', padding:16, borderRadius:12, background:C.blue, color:'#fff', fontWeight:700, border:'none', marginTop:12}}>Fertig</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StrengthModal({workout, day, onClose}) {
+  const r = ST[workout.routineKey];
+  if(!r) return null;
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()}>
+        <div style={{width:36, height:4, background:'var(--border-accent)', borderRadius:2, margin:'12px auto 20px'}} />
+        <div style={{padding:'0 20px 32px'}}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16}}>
+            <div>
+              <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:4}}>
+                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#000', padding:'2px 6px', borderRadius:4}}>{workout.routineKey}</span>
+                <h2 style={{fontSize:20, fontWeight:800, color:r.color}}>{r.name}</h2>
+              </div>
+              <p style={{fontSize:13, color:var(--dim)}}>{r.focus} · {r.dur}</p>
+            </div>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:var(--mid), width:32, height:32, borderRadius:50, cursor:'pointer', fontSize:18}}>×</button>
+          </div>
+          <div style={{display:'flex', flexDirection:'column'}}>
+            {r.routine.map(exId => <ExCard key={exId} exId={exId} />)}
+          </div>
+          <button onClick={onClose} style={{width:'100%', padding:16, borderRadius:12, background:r.color, color:'#000', fontWeight:700, border:'none', marginTop:24}}>Training beenden</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobilityModal({onClose}) {
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()}>
+        <div style={{width:36, height:4, background:'var(--border-accent)', borderRadius:2, margin:'12px auto 20px'}} />
+        <div style={{padding:'0 20px 32px'}}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16}}>
+            <div>
+              <h2 style={{fontSize:20, fontWeight:800, color:C.sage}}>Mobility & Flow</h2>
+              <p style={{fontSize:13, color:var(--dim)}}>Regeneration & Beweglichkeit</p>
+            </div>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:var(--mid), width:32, height:32, borderRadius:50, cursor:'pointer', fontSize:18}}>×</button>
+          </div>
+          <div style={{display:'flex', flexDirection:'column'}}>
+            {MOBILITY_ROUTINE.map(m => (
+              <div key={m.id} className="exercise-row" style={{padding:'12px 0'}}>
+                <div style={{display:'flex', gap:12}}>
+                  <span style={{fontSize:20}}>{m.icon}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:14, fontWeight:700, color:C.cloud}}>{m.name}</div>
+                    <div style={{fontSize:12, color:var(--dim), marginTop:2}}>{m.dur} · {m.focus}</div>
+                    <p style={{fontSize:13, color:var(--mid), marginTop:6, lineHeight:1.5}}>{m.desc}</p>
+                    <a href={m.url} target="_blank" rel="noopener noreferrer" style={{display:'inline-block', marginTop:8, fontSize:12, color:C.sage, textDecoration:'none'}}>▶ Video Demo</a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button onClick={onClose} style={{width:'100%', padding:16, borderRadius:12, background:C.sage, color:'#000', fontWeight:700, border:'none', marginTop:24}}>Schliessen</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [activeWeek, setActiveWeek] = useState('w1');
+  const [activeTab, setActiveTab] = useState('plan');
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const [showMobility, setShowMobility] = useState(false);
+
+  const week = INITIAL_PLAN.find(w => w.id === activeWeek);
+
+  return (
+    <div style={{maxWidth:640, margin:'0 auto', padding:'env(safe-area-inset-top) 16px 100px'}}>
+      <header style={{padding:'24px 0 32px', display:'flex', justifyContent:'space-between', alignItems:'flex-end'}}>
+        <div>
+          <div className="aneo-logo">ANEO<span>.</span></div>
+          <h1 style={{fontSize:28, fontWeight:900, color:C.cloud, letterSpacing:'-0.03em', marginTop:4}}>Witiker Plan</h1>
+        </div>
+        <div style={{textAlign:'right'}}>
+          <div style={{fontSize:11, fontWeight:700, color:var(--dim), textTransform:'uppercase', letterSpacing:'.1em'}}>Race Day</div>
+          <div style={{fontSize:16, fontWeight:800, color:C.blush}}>14. Mai 2026</div>
+        </div>
+      </header>
+
+      {activeTab === 'plan' && (
+        <>
+          <div style={{display:'flex', gap:8, overflowX:'auto', paddingBottom:16, scrollbarWidth:'none'}} className="no-scrollbar">
+            {INITIAL_PLAN.map(w => (
+              <button key={w.id} onClick={()=>setActiveWeek(w.id)} className={`week-tab ${activeWeek===w.id?'active':''}`}>
+                {w.label}
+              </button>
+            ))}
+          </div>
+
+          <div style={{marginTop:8}}>
+            <div className="section-title">{week.label} · {week.name}</div>
+            {week.days.map(day => (
+              <div key={day.date} className="card" style={{display:'flex', gap:16, alignItems:'center'}}>
+                <div style={{width:36, textAlign:'center', flexShrink:0}}>
+                  <div style={{fontSize:10, fontWeight:700, color:var(--dim), textTransform:'uppercase'}}>{day.label}</div>
+                  <div style={{fontSize:18, fontWeight:900, color:C.cloud}}>{day.date.split('-')[2]}</div>
+                </div>
+                <div style={{flex:1, display:'flex', flexDirection:'column', gap:8}}>
+                  {day.workouts.length === 0 ? (
+                    <div style={{fontSize:14, color:var(--dim), fontStyle:'italic'}}>Rest Day</div>
+                  ) : (
+                    day.workouts.map(w => (
+                      <div key={w.id} onClick={()=>{ if(w.type==='mobility') setShowMobility(true); else setSelectedWorkout({w, day}); }} 
+                        style={{cursor:'pointer', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                        <div>
+                          <div style={{fontSize:15, fontWeight:700, color:C.cloud}}>{w.title || (w.type==='strength'?ST[w.routineKey].name:'Mobility')}</div>
+                          <div style={{fontSize:12, color:var(--mid)}}>{w.type==='run'?`${w.km}km · ${w.hr}`:w.type==='strength'?ST[w.routineKey].focus:'Flow'}</div>
+                        </div>
+                        <div style={{fontSize:18}}>{w.type==='run'?'🏃':w.type==='strength'?'💪':'🧘'}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'stats' && (
+        <div style={{padding:'40px 0', textAlign:'center'}}>
+          <div style={{fontSize:48, marginBottom:16}}>📊</div>
+          <h2 style={{fontSize:20, fontWeight:800, color:C.cloud}}>Statistiken</h2>
+          <p style={{color:var(--dim), marginTop:8}}>Deine Fortschritte werden hier bald visualisiert.</p>
         </div>
       )}
+
+      <nav className="bottom-nav">
+        <div className={`bottom-nav-item ${activeTab==='plan'?'active':''}`} onClick={()=>setActiveTab('plan')}>
+          <span style={{fontSize:22}}>📅</span>
+          <span className="bottom-nav-label">Plan</span>
+        </div>
+        <div className={`bottom-nav-item ${activeTab==='stats'?'active':''}`} onClick={()=>setActiveTab('stats')}>
+          <span style={{fontSize:22}}>📈</span>
+          <span className="bottom-nav-label">Stats</span>
+        </div>
+        <div className="bottom-nav-item" onClick={()=>setShowMobility(true)}>
+          <span style={{fontSize:22}}>🧘</span>
+          <span className="bottom-nav-label">Flow</span>
+        </div>
+      </nav>
+
+      {selectedWorkout && selectedWorkout.w.type === 'run' && (
+        <RunModal workout={selectedWorkout.w} day={selectedWorkout.day} onClose={()=>setSelectedWorkout(null)} />
+      )}
+      {selectedWorkout && selectedWorkout.w.type === 'strength' && (
+        <StrengthModal workout={selectedWorkout.w} day={selectedWorkout.day} onClose={()=>setSelectedWorkout(null)} />
+      )}
+      {showMobility && <MobilityModal onClose={()=>setShowMobility(false)} />}
     </div>
   );
 }
