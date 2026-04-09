@@ -205,7 +205,7 @@ const INITIAL_WEEKS = [
 // ── HELPERS ───────────────────────────────────────
 const TAG_STYLE = {
   Easy:       { bg:'rgba(46,235,168,0.26)',   color:'#2EEBA8' },
-  Recovery:   { bg:'rgba(246,246,244,0.12)',  color:'rgba(246,246,244,0.75)' },
+  Recovery:   { bg:'rgba(240,230,216,0.12)',  color:'rgba(240,230,216,0.75)' },
   Speed:      { bg:'rgba(102,153,255,0.32)',  color:'#99BBFF' },
   Fartlek:    { bg:'rgba(102,153,255,0.32)',  color:'#99BBFF' },
   Tempo:      { bg:'rgba(102,153,255,0.35)',  color:'#99BBFF' },
@@ -386,7 +386,7 @@ function Logo() {
 }
 
 function Tag({t}) {
-  const s = TAG_STYLE[t] || {bg:'rgba(246,246,244,0.07)', color:'rgba(246,246,244,0.45)'};
+  const s = TAG_STYLE[t] || {bg:'rgba(240,230,216,0.07)', color:'rgba(240,230,216,0.45)'};
   return <span className="tag" style={{background:s.bg, color:s.color}}>{t}</span>;
 }
 
@@ -395,7 +395,7 @@ function WorkoutPill({w, day, weekId, onOpen, isDragging, onDragStart, onDragEnd
   return (
     <div
       className={`pill ${isDragging?'dragging':''}`}
-      style={{background: isDragging ? 'rgba(92,141,255,0.08)' : cfg.bgDim, border:`1px solid ${isDragging ? cfg.color : isCompleted ? 'rgba(61,217,160,0.25)' : 'rgba(246,246,244,0.06)'}`, position:'relative'}}
+      style={{background: isDragging ? 'rgba(92,141,255,0.08)' : cfg.bgDim, border:`1px solid ${isDragging ? cfg.color : isCompleted ? 'rgba(61,217,160,0.25)' : 'rgba(240,230,216,0.06)'}`, position:'relative'}}
       draggable={true}
       onDragStart={e => { e.dataTransfer.effectAllowed='move'; onDragStart(w, day, weekId); }}
       onDragEnd={onDragEnd}
@@ -405,9 +405,9 @@ function WorkoutPill({w, day, weekId, onOpen, isDragging, onDragStart, onDragEnd
       <span style={{fontSize:14, flexShrink:0}}>{cfg.icon}</span>
       <div style={{flex:1, minWidth:0}}>
         <div style={{display:'flex', alignItems:'center', gap:6}}>
-          <span style={{fontSize:13, fontWeight:700, color:'#FFFFFF', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{w.title}</span>
+          <span style={{fontSize:13, fontWeight:700, color:'var(--cloud)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{w.title}</span>
           {w.type==='run' && w.km && <span style={{fontSize:12, color:'rgba(255,255,255,0.7)', flexShrink:0, fontWeight:600}}>{w.km}km</span>}
-          {w.routineKey && <span style={{fontSize:11, fontWeight:800, color:'#FFFFFF', background:ST[w.routineKey]?.color||C.sage, padding:'1px 6px', borderRadius:4, flexShrink:0, border:'1px solid rgba(255,255,255,0.2)'}}>{w.routineKey}</span>}
+          {w.routineKey && <span style={{fontSize:11, fontWeight:800, color:'var(--cloud)', background:ST[w.routineKey]?.color||C.sage, padding:'1px 6px', borderRadius:4, flexShrink:0, border:'1px solid rgba(255,255,255,0.2)'}}>{w.routineKey}</span>}
         </div>
         {w.type==='run' && w.tags && w.tags.length > 0 && (
           <div style={{display:'flex', flexWrap:'wrap', gap:4, marginTop:4}}>
@@ -419,7 +419,7 @@ function WorkoutPill({w, day, weekId, onOpen, isDragging, onDragStart, onDragEnd
         {isCompleted && <span style={{color:C.sage, fontSize:14}}>✓</span>}
         <button
           className="mobile-only"
-          style={{padding:'4px 6px', borderRadius:6, background:'rgba(246,246,244,0.07)', border:'none', color:'rgba(246,246,244,0.4)', fontSize:12, cursor:'pointer', lineHeight:1}}
+          style={{padding:'4px 6px', borderRadius:6, background:'rgba(240,230,216,0.07)', border:'none', color:'rgba(240,230,216,0.4)', fontSize:12, cursor:'pointer', lineHeight:1}}
           onClick={e => { e.stopPropagation(); onMoveClick(w, day, weekId); }}
         >⇄</button>
       </div>
@@ -454,10 +454,10 @@ function DayCard({day, weekId, week, onOpen, dragState, onDragStart, onDragEnd, 
     >
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
-          <span style={{fontSize:13, fontWeight:700, color: isRace?C.gold : isToday?C.blue : 'rgba(246,246,244,0.85)'}}>{day.label}</span>
+          <span style={{fontSize:13, fontWeight:700, color: isRace?C.gold : isToday?C.blue : 'rgba(240,230,216,0.85)'}}>{day.label}</span>
           {isToday && <span style={{fontSize:10, fontWeight:800, background:C.blue, color:'#080810', padding:'2px 7px', borderRadius:4, letterSpacing:'0.05em', boxShadow:`0 0 10px ${C.blue}`}}>HEUTE</span>}
         </div>
-        {dayKm > 0 && <span style={{fontSize:12, color:'rgba(246,246,244,0.55)', fontWeight:600}}>{dayKm}km</span>}
+        {dayKm > 0 && <span style={{fontSize:12, color:'rgba(240,230,216,0.55)', fontWeight:600}}>{dayKm}km</span>}
       </div>
       <div style={{display:'flex', flexDirection:'column', gap:6}}>
         {day.workouts.map(w => (
@@ -497,19 +497,19 @@ function MoveModal({data, plan, onMove, onClose}) {
               <div style={{fontSize:16, fontWeight:800, color:'var(--cloud)'}}>Verschieben nach</div>
               <div style={{fontSize:12, color:cfg.color, fontWeight:600, marginTop:2}}>{workout.title}</div>
             </div>
-            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(240,230,216,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
           </div>
         </div>
         <div style={{padding:16, overflowY:'auto'}}>
           {plan.map(week => (
             <div key={week.id} style={{marginBottom:16}}>
-              <div style={{fontSize:11, fontWeight:700, color:'rgba(246,246,244,0.35)', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:8}}>{week.label} · {week.name}</div>
+              <div style={{fontSize:11, fontWeight:700, color:'rgba(240,230,216,0.35)', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:8}}>{week.label} · {week.name}</div>
               <div style={{display:'flex', flexDirection:'column', gap:6}}>
                 {week.days.filter(d=>d.date!==sourceDayDate).map(day => (
                   <button key={day.date} onClick={()=>onMove(day.date,week.id)}
                     style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 14px', borderRadius:10, background:'var(--surface-2)', border:'1px solid var(--border)', cursor:'pointer', textAlign:'left', width:'100%'}}>
                     <span style={{fontSize:13, fontWeight:600, color:'var(--cloud)'}}>{day.label}</span>
-                    <span style={{fontSize:12, color:'rgba(246,246,244,0.35)'}}>
+                    <span style={{fontSize:12, color:'rgba(240,230,216,0.35)'}}>
                       {day.workouts.filter(w=>w.type==='run').reduce((s,w)=>s+(w.km||0),0)||'–'}km
                     </span>
                   </button>
@@ -535,15 +535,15 @@ function ExCard({exId}) {
         <span style={{fontSize:20, flexShrink:0}}>{ex.i}</span>
         <div style={{flex:1}}>
           <div style={{fontSize:14, fontWeight:700, color:'var(--cloud)'}}>{ex.n}</div>
-          <div style={{fontSize:12, color:'rgba(246,246,244,0.4)', marginTop:2}}>{ex.m} · <span style={{color:catColor, fontWeight:600}}>{ex.s}</span></div>
+          <div style={{fontSize:12, color:'rgba(240,230,216,0.4)', marginTop:2}}>{ex.m} · <span style={{color:catColor, fontWeight:600}}>{ex.s}</span></div>
         </div>
-        <span style={{color:'rgba(246,246,244,0.25)', fontSize:12, flexShrink:0}}>{open?'▲':'▼'}</span>
+        <span style={{color:'rgba(240,230,216,0.25)', fontSize:12, flexShrink:0}}>{open?'▲':'▼'}</span>
       </button>
       {open && (
         <div style={{marginTop:12, paddingLeft:32, display:'flex', flexDirection:'column', gap:10}}>
-          <p style={{fontSize:13, color:'rgba(246,246,244,0.7)', lineHeight:1.6}}>{ex.d}</p>
+          <p style={{fontSize:13, color:'rgba(240,230,216,0.7)', lineHeight:1.6}}>{ex.d}</p>
           {ex.cues && <div style={{display:'flex', flexDirection:'column', gap:4}}>
-            {ex.cues.map((c,i)=><div key={i} style={{fontSize:12, color:'rgba(246,246,244,0.5)', display:'flex', gap:8}}><span style={{color:catColor,flexShrink:0}}>→</span>{c}</div>)}
+            {ex.cues.map((c,i)=><div key={i} style={{fontSize:12, color:'rgba(240,230,216,0.5)', display:'flex', gap:8}}><span style={{color:catColor,flexShrink:0}}>→</span>{c}</div>)}
           </div>}
           {ex.warn && <div style={{fontSize:12, padding:'8px 12px', borderRadius:8, background:'rgba(255,217,125,0.08)', border:'1px solid rgba(255,217,125,0.15)', color:'#FFD97D'}}>{ex.warn}</div>}
           {ex.note && <div style={{fontSize:12, padding:'8px 12px', borderRadius:8, background:'rgba(176,224,205,0.08)', border:'1px solid rgba(176,224,205,0.15)', color:C.sage}}>{ex.note}</div>}
@@ -573,9 +573,9 @@ function RunModal({workout, day, onClose, onToggleComplete, isCompleted, onEdit,
                 <span style={{fontSize:18}}>⚡</span>
                 <h2 style={{fontSize:18, fontWeight:800, color:C.cloud, letterSpacing:'-0.01em'}}>{workout.title}</h2>
               </div>
-              <p style={{fontSize:12, color:'rgba(246,246,244,0.35)'}}>{day?.label}</p>
+              <p style={{fontSize:12, color:'rgba(240,230,216,0.35)'}}>{day?.label}</p>
             </div>
-            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>×</button>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(240,230,216,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>×</button>
           </div>
           <div style={{display:'flex', flexWrap:'wrap', gap:4, paddingBottom:14}}>
             {workout.tags?.map(t=><Tag key={t} t={t}/>)}
@@ -585,20 +585,20 @@ function RunModal({workout, day, onClose, onToggleComplete, isCompleted, onEdit,
           {/* Metrics */}
           <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10}}>
             {[
-              { label:'Distanz', value: <div style={{display:'flex',alignItems:'center',gap:4}}><input type="number" step="0.5" min="1" max="120" value={km} onChange={e=>onEdit(`km_${workout.id}`,e.target.value)} style={{width:52,background:'none',border:'none',borderBottom:`1px solid ${C.blue}`,outline:'none',fontSize:22,fontWeight:800,color:C.blue,textAlign:'center',padding:'0 0 2px'}}/><span style={{fontSize:13,color:'rgba(246,246,244,0.35)',fontWeight:500}}>km</span></div> },
-              { label:'Dauer', value: <div style={{display:'flex',alignItems:'center',gap:4}}><input type="number" step="5" min="10" max="600" value={dur} onChange={e=>onEdit(`dur_${workout.id}`,e.target.value)} style={{width:52,background:'none',border:'none',borderBottom:`1px solid ${C.sage}`,outline:'none',fontSize:22,fontWeight:800,color:C.sage,textAlign:'center',padding:'0 0 2px'}}/><span style={{fontSize:13,color:'rgba(246,246,244,0.35)',fontWeight:500}}>min</span></div> },
+              { label:'Distanz', value: <div style={{display:'flex',alignItems:'center',gap:4}}><input type="number" step="0.5" min="1" max="120" value={km} onChange={e=>onEdit(`km_${workout.id}`,e.target.value)} style={{width:52,background:'none',border:'none',borderBottom:`1px solid ${C.blue}`,outline:'none',fontSize:22,fontWeight:800,color:C.blue,textAlign:'center',padding:'0 0 2px'}}/><span style={{fontSize:13,color:'rgba(240,230,216,0.35)',fontWeight:500}}>km</span></div> },
+              { label:'Dauer', value: <div style={{display:'flex',alignItems:'center',gap:4}}><input type="number" step="5" min="10" max="600" value={dur} onChange={e=>onEdit(`dur_${workout.id}`,e.target.value)} style={{width:52,background:'none',border:'none',borderBottom:`1px solid ${C.sage}`,outline:'none',fontSize:22,fontWeight:800,color:C.sage,textAlign:'center',padding:'0 0 2px'}}/><span style={{fontSize:13,color:'rgba(240,230,216,0.35)',fontWeight:500}}>min</span></div> },
               { label:'Herzfrequenz', value: <div style={{fontSize:20,fontWeight:800,color:C.blush}}>{workout.hr}</div> }
             ].map(m => (
               <div key={m.label} style={{background:'var(--surface-2)', borderRadius:12, padding:'12px 8px', textAlign:'center', border:'1px solid var(--border)'}}>
-                <div style={{fontSize:10, color:'rgba(246,246,244,0.35)', fontWeight:600, letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:6}}>{m.label}</div>
+                <div style={{fontSize:10, color:'rgba(240,230,216,0.35)', fontWeight:600, letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:6}}>{m.label}</div>
                 {m.value}
               </div>
             ))}
           </div>
           {/* Description */}
           <div style={{background:'var(--surface-2)', borderRadius:12, padding:14, border:'1px solid var(--border)'}}>
-            <div style={{fontSize:11, fontWeight:700, color:'rgba(246,246,244,0.35)', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:8}}>Einheit</div>
-            <p style={{fontSize:14, color:'rgba(246,246,244,0.75)', lineHeight:1.7}}>{workout.description}</p>
+            <div style={{fontSize:11, fontWeight:700, color:'rgba(240,230,216,0.35)', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:8}}>Einheit</div>
+            <p style={{fontSize:14, color:'rgba(240,230,216,0.75)', lineHeight:1.7}}>{workout.description}</p>
           </div>
           {/* Garmin */}
           {canExport && (
@@ -612,7 +612,7 @@ function RunModal({workout, day, onClose, onToggleComplete, isCompleted, onEdit,
           {/* Actions */}
           <div style={{display:'flex', gap:8}}>
             <button onClick={()=>{onToggleComplete(workout.id);onClose();}}
-              style={{flex:1, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.sage, color:isCompleted?'rgba(246,246,244,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':C.sage}`}}>
+              style={{flex:1, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.sage, color:isCompleted?'rgba(240,230,216,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':C.sage}`}}>
               {isCompleted ? '↩ Rückgängig' : '✓ Abgeschlossen'}
             </button>
             <button onClick={onMoveOpen}
@@ -636,21 +636,21 @@ function StrengthModal({workout, day, onClose, onToggleComplete, isCompleted}) {
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4}}>
             <div>
               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:4}}>
-                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#FFFFFF', padding:'3px 8px', borderRadius:4, border:'1px solid rgba(255,255,255,0.2)'}}>{workout.routineKey}</span>
+                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'var(--cloud)', padding:'3px 8px', borderRadius:4, border:'1px solid rgba(255,255,255,0.2)'}}>{workout.routineKey}</span>
                 <h2 style={{fontSize:17, fontWeight:800, color:r.color}}>{r.name}</h2>
               </div>
-              <p style={{fontSize:12, color:'rgba(246,246,244,0.35)'}}>{r.focus} · {r.dur}</p>
+              <p style={{fontSize:12, color:'rgba(240,230,216,0.35)'}}>{r.focus} · {r.dur}</p>
             </div>
-            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>×</button>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(240,230,216,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>×</button>
           </div>
-          <div style={{background:'rgba(246,246,244,0.04)', borderRadius:8, padding:'8px 12px', margin:'12px 0', fontSize:12, color:'rgba(246,246,244,0.5)'}}>
+          <div style={{background:'rgba(240,230,216,0.04)', borderRadius:8, padding:'8px 12px', margin:'12px 0', fontSize:12, color:'rgba(240,230,216,0.5)'}}>
             🔥 {r.warmup}
           </div>
         </div>
         <div style={{padding:'0 20px 20px'}}>
           {r.exIds.map(id => <ExCard key={id} exId={id}/>)}
           <button onClick={()=>{onToggleComplete(workout.id);onClose();}}
-            style={{width:'100%', marginTop:16, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':r.color, color:isCompleted?'rgba(246,246,244,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':r.color}`}}>
+            style={{width:'100%', marginTop:16, padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':r.color, color:isCompleted?'rgba(240,230,216,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':r.color}`}}>
             {isCompleted?'↩ Rückgängig':'✓ Training abgeschlossen'}
           </button>
         </div>
@@ -667,9 +667,9 @@ function MobilityModal({workout, day, onClose, onToggleComplete, isCompleted}) {
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', paddingBottom:14}}>
             <div>
               <h2 style={{fontSize:17, fontWeight:800, color:C.blush}}>◎ Mobility – 15 Min</h2>
-              <p style={{fontSize:12, color:'rgba(246,246,244,0.35)', marginTop:2}}>Hüftmobilisierung täglich · Balance Board</p>
+              <p style={{fontSize:12, color:'rgba(240,230,216,0.35)', marginTop:2}}>Hüftmobilisierung täglich · Balance Board</p>
             </div>
-            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(240,230,216,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
           </div>
         </div>
         <div style={{padding:20, display:'flex', flexDirection:'column', gap:10}}>
@@ -681,8 +681,8 @@ function MobilityModal({workout, day, onClose, onToggleComplete, isCompleted}) {
                   <div style={{flex:1}}>
                     <div style={{fontSize:13, fontWeight:700, color:'var(--cloud)'}}>{ex.name}</div>
                     <div style={{fontSize:12, color:C.blush, fontWeight:600, marginTop:1}}>{ex.dur}</div>
-                    <div style={{fontSize:11, color:'rgba(246,246,244,0.35)', marginTop:1}}>{ex.focus}</div>
-                    <p style={{fontSize:12, color:'rgba(246,246,244,0.55)', marginTop:6, lineHeight:1.6}}>{ex.desc}</p>
+                    <div style={{fontSize:11, color:'rgba(240,230,216,0.35)', marginTop:1}}>{ex.focus}</div>
+                    <p style={{fontSize:12, color:'rgba(240,230,216,0.55)', marginTop:6, lineHeight:1.6}}>{ex.desc}</p>
                     <div style={{display:'flex', flexWrap:'wrap', gap:4, marginTop:6}}>
                       {ex.cues.map((c,j)=><span key={j} style={{fontSize:11, background:'rgba(245,192,208,0.08)', color:'rgba(245,192,208,0.7)', padding:'2px 8px', borderRadius:4}}>{c}</span>)}
                     </div>
@@ -694,7 +694,7 @@ function MobilityModal({workout, day, onClose, onToggleComplete, isCompleted}) {
             </div>
           ))}
           <button onClick={()=>{onToggleComplete(workout.id);onClose();}}
-            style={{padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.blush, color:isCompleted?'rgba(246,246,244,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':C.blush}`}}>
+            style={{padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:isCompleted?'var(--surface-2)':C.blush, color:isCompleted?'rgba(240,230,216,0.4)':'#FFFFFF', border:`1px solid ${isCompleted?'var(--border)':C.blush}`}}>
             {isCompleted?'↩ Rückgängig':'✓ Mobility abgeschlossen'}
           </button>
         </div>
@@ -713,7 +713,7 @@ function RaceModal({onClose}) {
               <div style={{fontSize:32, fontWeight:900, color:C.gold, letterSpacing:'-0.03em', lineHeight:1}}>Λ · Ω</div>
               <div style={{fontSize:11, color:'rgba(255,217,125,0.5)', fontWeight:600, letterSpacing:'0.1em', marginTop:4}}>BUILD FOR THE WHOLE JOURNEY.</div>
             </div>
-            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(240,230,216,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
           </div>
           <h2 style={{fontSize:22, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em', marginBottom:4}}>Witiker Backyard Ultra</h2>
           <p style={{fontSize:15, fontWeight:600, color:C.gold, marginBottom:20}}>14. Mai 2026 · Start 12:00 Uhr</p>
@@ -731,7 +731,7 @@ function RaceModal({onClose}) {
               <div key={i} style={{display:'flex', gap:8, fontSize:13, color:'rgba(255,217,125,0.7)', marginBottom:6}}><span style={{color:C.gold, flexShrink:0}}>→</span>{s}</div>
             ))}
           </div>
-          <button onClick={onClose} style={{width:'100%', padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:C.gold, color:'#FFFFFF', border:'none'}}>Schliessen</button>
+          <button onClick={onClose} style={{width:'100%', padding:'13px', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer', background:C.gold, color:'var(--cloud)', border:'none'}}>Schliessen</button>
         </div>
       </div>
     </div>
@@ -744,7 +744,7 @@ function MobilityTab() {
     <div style={{padding:'0 0 80px'}}>
       <div style={{background:'rgba(245,192,208,0.06)', border:'1px solid rgba(245,192,208,0.15)', borderRadius:14, padding:16, marginBottom:20}}>
         <div style={{fontSize:16, fontWeight:800, color:C.blush, marginBottom:4}}>Tägliche Abend-Routine · 15 Min</div>
-        <p style={{fontSize:13, color:'rgba(246,246,244,0.5)', lineHeight:1.6}}>7× pro Woche – jeden Abend. Fokus gemäss Sportarzt: Hüfte ist leicht steif. Balance Board bei markierten Übungen einsetzen.</p>
+        <p style={{fontSize:13, color:'rgba(240,230,216,0.5)', lineHeight:1.6}}>7× pro Woche – jeden Abend. Fokus gemäss Sportarzt: Hüfte ist leicht steif. Balance Board bei markierten Übungen einsetzen.</p>
       </div>
       <div style={{display:'flex', flexDirection:'column', gap:12}}>
         {MOBILITY_ROUTINE.map((ex,i)=>(
@@ -759,7 +759,7 @@ function MobilityTab() {
                 <div style={{fontSize:12, color:C.blush, fontWeight:600, marginTop:2}}>{ex.dur}</div>
               </div>
             </div>
-            <p style={{fontSize:13, color:'rgba(246,246,244,0.55)', lineHeight:1.6, marginBottom:8}}>{ex.desc}</p>
+            <p style={{fontSize:13, color:'rgba(240,230,216,0.55)', lineHeight:1.6, marginBottom:8}}>{ex.desc}</p>
             <div style={{display:'flex', flexWrap:'wrap', gap:4}}>
               {ex.cues.map((c,j)=><span key={j} style={{fontSize:11, background:'rgba(245,192,208,0.08)', color:'rgba(245,192,208,0.65)', padding:'3px 8px', borderRadius:4, border:'1px solid rgba(245,192,208,0.12)'}}>{c}</span>)}
             </div>
@@ -783,10 +783,10 @@ function OverviewTab({plan, edits, setActiveWeek, setActiveTab}) {
             return (
               <div key={w.id} style={{cursor:'pointer'}} onClick={()=>{setActiveWeek(i);setActiveTab('plan');}}>
                 <div style={{display:'flex', justifyContent:'space-between', marginBottom:6}}>
-                  <span style={{fontSize:13, fontWeight:700, color:'var(--cloud)'}}>{w.label} <span style={{fontWeight:500, color:'rgba(246,246,244,0.55)'}}>– {w.name}</span></span>
-                  <span style={{fontSize:13, fontWeight:700, color:'rgba(246,246,244,0.7)'}}>{w.targetKm} km</span>
+                  <span style={{fontSize:13, fontWeight:700, color:'var(--cloud)'}}>{w.label} <span style={{fontWeight:500, color:'rgba(240,230,216,0.55)'}}>– {w.name}</span></span>
+                  <span style={{fontSize:13, fontWeight:700, color:'rgba(240,230,216,0.7)'}}>{w.targetKm} km</span>
                 </div>
-                <div style={{height:5, background:'rgba(246,246,244,0.07)', borderRadius:3, overflow:'hidden'}}>
+                <div style={{height:5, background:'rgba(240,230,216,0.07)', borderRadius:3, overflow:'hidden'}}>
                   <div style={{height:'100%', width:`${pct}%`, background:w.color, borderRadius:3, transition:'width 0.4s ease', boxShadow:`0 0 6px ${w.color}`}}/>
                 </div>
               </div>
@@ -800,12 +800,12 @@ function OverviewTab({plan, edits, setActiveWeek, setActiveTab}) {
           {Object.entries(ST).map(([key,r])=>(
             <div key={key} style={{borderRadius:12, padding:14, background:'var(--surface-2)', border:'1px solid var(--border)'}}>
               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:4}}>
-                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'#FFFFFF', padding:'2px 8px', borderRadius:4, border:'1px solid rgba(255,255,255,0.2)'}}>{key}</span>
+                <span style={{fontSize:11, fontWeight:800, background:r.color, color:'var(--cloud)', padding:'2px 8px', borderRadius:4, border:'1px solid rgba(255,255,255,0.2)'}}>{key}</span>
                 <span style={{fontSize:14, fontWeight:700, color:r.color}}>{r.name}</span>
               </div>
-              <p style={{fontSize:12, color:'rgba(246,246,244,0.55)', marginBottom:10}}>{r.focus}</p>
+              <p style={{fontSize:12, color:'rgba(240,230,216,0.55)', marginBottom:10}}>{r.focus}</p>
               {r.exIds.map(id=>{const e=EX[id];return e?(<div key={id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 0',borderBottom:'1px solid var(--border)'}}>
-                <span style={{fontSize:16}}>{e.i}</span><span style={{fontSize:13,color:'rgba(246,246,244,0.78)',flex:1}}>{e.n}</span><span style={{fontSize:11,color:'rgba(246,246,244,0.45)',fontWeight:600}}>{e.s}</span></div>):null})}
+                <span style={{fontSize:16}}>{e.i}</span><span style={{fontSize:13,color:'rgba(240,230,216,0.78)',flex:1}}>{e.n}</span><span style={{fontSize:11,color:'rgba(240,230,216,0.45)',fontWeight:600}}>{e.s}</span></div>):null})}
             </div>
           ))}
         </div>
@@ -838,12 +838,12 @@ function GarminWeekModal({week, onClose}) {
               <div style={{fontSize:16, fontWeight:800, color:C.gold}}>⌚ Garmin – {week.label} {week.name}</div>
               <p style={{fontSize:12, color:'rgba(255,217,125,0.5)', marginTop:3}}>Strukturierte Einheiten als TCX herunterladen</p>
             </div>
-            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(246,246,244,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
+            <button onClick={onClose} style={{background:'var(--surface-2)', border:'none', color:'rgba(240,230,216,0.4)', width:32, height:32, borderRadius:8, cursor:'pointer', fontSize:18, display:'flex', alignItems:'center', justifyContent:'center'}}>×</button>
           </div>
         </div>
         <div style={{padding:20, display:'flex', flexDirection:'column', gap:12}}>
           {exportable.length === 0 ? (
-            <p style={{fontSize:13, color:'rgba(246,246,244,0.4)', textAlign:'center', padding:'20px 0'}}>Keine strukturierten Einheiten diese Woche.</p>
+            <p style={{fontSize:13, color:'rgba(240,230,216,0.4)', textAlign:'center', padding:'20px 0'}}>Keine strukturierten Einheiten diese Woche.</p>
           ) : exportable.map(({w, date, label}) => (
             <div key={w.id} style={{background:'var(--surface-2)', borderRadius:12, padding:14, border:'1px solid rgba(255,217,125,0.15)', display:'flex', alignItems:'center', gap:12}}>
               <div style={{flex:1, minWidth:0}}>
@@ -975,26 +975,26 @@ function App() {
               <div style={{display:'flex', alignItems:'center', gap:8}}>
                 <div style={{textAlign:'center'}}>
                   <div style={{fontSize:22, fontWeight:900, color:'var(--cloud)', lineHeight:1}}>{cd.days}</div>
-                  <div style={{fontSize:9, color:'rgba(246,246,244,0.3)', fontWeight:600, letterSpacing:'0.06em'}}>TAGE</div>
+                  <div style={{fontSize:9, color:'rgba(240,230,216,0.3)', fontWeight:600, letterSpacing:'0.06em'}}>TAGE</div>
                 </div>
-                <div style={{color:'rgba(246,246,244,0.2)', fontWeight:300}}>:</div>
+                <div style={{color:'rgba(240,230,216,0.2)', fontWeight:300}}>:</div>
                 <div style={{textAlign:'center'}}>
                   <div style={{fontSize:22, fontWeight:900, color:'var(--cloud)', lineHeight:1}}>{cd.hours}</div>
-                  <div style={{fontSize:9, color:'rgba(246,246,244,0.3)', fontWeight:600, letterSpacing:'0.06em'}}>STD</div>
+                  <div style={{fontSize:9, color:'rgba(240,230,216,0.3)', fontWeight:600, letterSpacing:'0.06em'}}>STD</div>
                 </div>
               </div>
             ) : <span style={{color:C.gold, fontWeight:700}}>RACE DAY Λ Ω</span>}
-            <div style={{fontSize:9, color:'rgba(246,246,244,0.2)', marginTop:2}}>{totalWo.d}/{totalWo.t} ✓</div>
+            <div style={{fontSize:9, color:'rgba(240,230,216,0.2)', marginTop:2}}>{totalWo.d}/{totalWo.t} ✓</div>
           </div>
         </div>
         {/* Progress bar */}
-        <div style={{height:2, background:'rgba(246,246,244,0.05)'}}>
+        <div style={{height:2, background:'rgba(240,230,216,0.05)'}}>
           <div style={{height:'100%', width:`${Math.round(totalWo.d/totalWo.t*100)}%`, background:`linear-gradient(90deg,${C.blue},${C.sage})`, transition:'width 0.5s ease'}}/>
         </div>
         {/* Desktop tabs */}
         <div className="desktop-only" style={{maxWidth:900, margin:'0 auto', padding:'8px 16px', display:'flex', gap:6}}>
           {[['plan','📅 Plan'],['mobility','◎ Mobility'],['overview','◻ Übersicht']].map(([t,l])=>(
-            <button key={t} onClick={()=>setActiveTab(t)} style={{padding:'6px 16px', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', border:'none', background:activeTab===t?'rgba(246,246,244,0.08)':'transparent', color:activeTab===t?'var(--cloud)':'rgba(246,246,244,0.35)', transition:'all 0.15s'}}>{l}</button>
+            <button key={t} onClick={()=>setActiveTab(t)} style={{padding:'6px 16px', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', border:'none', background:activeTab===t?'rgba(240,230,216,0.08)':'transparent', color:activeTab===t?'var(--cloud)':'rgba(240,230,216,0.35)', transition:'all 0.15s'}}>{l}</button>
           ))}
         </div>
       </div>
@@ -1027,12 +1027,12 @@ function App() {
                 <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8}}>
                   <div style={{fontSize:28, fontWeight:900, color:'var(--cloud)', letterSpacing:'-0.02em', lineHeight:1}}>
                     {Math.round(weekKmDone(week, edits, completed))}
-                    <span style={{fontSize:14, color:'rgba(246,246,244,0.3)', fontWeight:400, marginLeft:4}}>/ {week.targetKm} km</span>
+                    <span style={{fontSize:14, color:'rgba(240,230,216,0.3)', fontWeight:400, marginLeft:4}}>/ {week.targetKm} km</span>
                   </div>
                   <button onClick={()=>setGarminWeek(true)} style={{display:'flex', alignItems:'center', gap:5, padding:'5px 10px', borderRadius:8, background:'rgba(255,217,125,0.1)', border:'1px solid rgba(255,217,125,0.3)', color:C.gold, fontSize:11, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap'}}>⌚ Garmin</button>
                 </div>
               </div>
-              <div style={{height:4, background:'rgba(246,246,244,0.07)', borderRadius:2, overflow:'hidden', marginBottom:14}}>
+              <div style={{height:4, background:'rgba(240,230,216,0.07)', borderRadius:2, overflow:'hidden', marginBottom:14}}>
                 <div style={{height:'100%', width:`${Math.min(100,Math.round(weekKmDone(week,edits,completed)/week.targetKm*100))}%`, background:week.color, borderRadius:2, transition:'width 0.5s ease', boxShadow:`0 0 8px ${week.color}`}}/>
               </div>
               <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8}}>
@@ -1043,7 +1043,7 @@ function App() {
                 ].map(s=>(
                   <div key={s.label} className={s.glow} style={{background:'var(--surface-2)', borderRadius:10, padding:'10px 8px', textAlign:'center', border:`1px solid ${s.border}`}}>
                     <div style={{fontSize:22, fontWeight:900, color:s.color, letterSpacing:'-0.02em'}}>{s.val}</div>
-                    <div style={{fontSize:10, color:'rgba(246,246,244,0.55)', fontWeight:700, letterSpacing:'0.05em', marginTop:3, textTransform:'uppercase'}}>{s.label}</div>
+                    <div style={{fontSize:10, color:'rgba(240,230,216,0.55)', fontWeight:700, letterSpacing:'0.05em', marginTop:3, textTransform:'uppercase'}}>{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -1068,7 +1068,7 @@ function App() {
               ))}
             </div>
             {/* Desktop drag hint */}
-            <div className="desktop-only" style={{textAlign:'center', marginTop:16, fontSize:12, color:'rgba(246,246,244,0.18)', letterSpacing:'0.04em'}}>
+            <div className="desktop-only" style={{textAlign:'center', marginTop:16, fontSize:12, color:'rgba(240,230,216,0.18)', letterSpacing:'0.04em'}}>
               ⠿ Einheiten per Drag & Drop zwischen Tagen verschieben
             </div>
           </>
@@ -1083,7 +1083,7 @@ function App() {
         {[['plan','📅','Plan'],['mobility','◎','Mobility'],['overview','◻','Übersicht']].map(([t,ic,l])=>(
           <button key={t} className="bottom-nav-item" style={{background:'none', border:'none', cursor:'pointer', '-webkit-tap-highlight-color':'transparent'}} onClick={()=>setActiveTab(t)}>
             <span style={{fontSize:22, opacity:activeTab===t?1:0.35}}>{ic}</span>
-            <span className="bottom-nav-label" style={{color:activeTab===t?C.blue:'rgba(246,246,244,0.35)'}}>{l}</span>
+            <span className="bottom-nav-label" style={{color:activeTab===t?C.blue:'rgba(240,230,216,0.35)'}}>{l}</span>
           </button>
         ))}
       </nav>
