@@ -313,10 +313,11 @@ const INIT_WEEKS=[
     ]),
   ]},
 
-  // KW18: 130km (+20%) → 18+16+18+18+13+22+25 = 130 ✓
-  {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:130,color:'#F87171',phase:'Peak',days:[
+  // KW18: Peak → Mo/Mi auf 16km gekappt (Kraft-Tag), 4km → Sa; Do 2. Session (kein Kraft); Sim korrigiert 5×6.706=33.5km
+  // 16+16+16+(16+2)+13+(33.5+4)+25 = 141.5km
+  {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:142,color:'#F87171',phase:'Peak',days:[
     day('2026-04-27','Mo 27. Apr',[
-      run('r3-1','Easy Run',18,115,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm. Gut essen und trinken.',['Easy']),
+      run('r3-1','Easy Run',16,102,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm. Gut essen und trinken. (2km → Sa)',['Easy']),
       str('s3-1','A'),
       mob('m3-1'),
     ]),
@@ -325,12 +326,13 @@ const INIT_WEEKS=[
       mob('m3-2'),
     ]),
     day('2026-04-29','Mi 29. Apr',[
-      run('r3-3','Easy + Power Hike',18,118,'Z1–Z2','Easy mit 45 Min Power Hike. Hike-Pace auf definiertem Hügel dokumentieren. Schwellenpunkt bestimmen.',['Easy','PowerHike']),
+      run('r3-3','Easy + Power Hike',16,105,'Z1–Z2','Easy mit 45 Min Power Hike. Hike-Pace auf definiertem Hügel dokumentieren. Schwellenpunkt bestimmen. (2km → Sa)',['Easy','PowerHike']),
       str('s3-2','B'),
       mob('m3-3'),
     ]),
     day('2026-04-30','Do 30. Apr',[
-      run('r3-4','Easy Run',18,115,'Z1–Z2','Grosser Volumen-Tag. Locker. Gut trinken und essen. Bei Erschöpfung 2km kürzen.',['Easy']),
+      run('r3-4','Easy Run',16,102,'Z1–Z2','Grosser Volumen-Tag. Locker. Gut trinken und essen.',['Easy']),
+      run('r3-4b','Easy Run (Abend)',2,14,'Z1','2km Spill-over abends – sehr locker, Beine drehen.',['Easy']),
       mob('m3-4'),
     ]),
     day('2026-05-01','Fr 1. Mai',[
@@ -338,7 +340,7 @@ const INIT_WEEKS=[
       str('s3-3','C','leichter'),
     ]),
     day('2026-05-02','Sa 2. Mai',[
-      run('r3-6','Witiker Simulation',22,152,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde, 125Hm). Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
+      run('r3-6','Witiker Simulation',37.5,265,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde = 33.5km, 125Hm) + 4km Easy Spill-over (Mo+Mi). Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
       mob('m3-5','Mobility 20 Min (Race Recovery)'),
     ]),
     day('2026-05-03','So 3. Mai',[
@@ -540,28 +542,90 @@ function RunModal({wo,day,onClose,onToggle,isDone}){
   );
 }
 
-/* ── MOVE MODAL ──────────────────────────────────── */
+/* ── MOVE MODAL (Kalender) ───────────────────────── */
 function MoveModal({woId,sourceDayDate,sourceWeekId,plan,onMove,onClose}){
+  const today=new Date();
+  const [viewYear,setViewYear]=useState(today.getFullYear());
+  const [viewMonth,setViewMonth]=useState(today.getMonth());
+
+  const availDays=new Set();
+  plan.forEach(wk=>wk.days.forEach(d=>{if(d.date!==sourceDayDate)availDays.add(d.date);}));
+
+  const firstDay=new Date(viewYear,viewMonth,1);
+  const lastDay=new Date(viewYear,viewMonth+1,0);
+  let startDow=firstDay.getDay();
+  startDow=(startDow+6)%7;
+
+  const cells=[];
+  for(let i=0;i<startDow;i++)cells.push(null);
+  for(let d=1;d<=lastDay.getDate();d++)cells.push(new Date(viewYear,viewMonth,d));
+
+  const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const DOW=['Mo','Di','Mi','Do','Fr','Sa','So'];
+  const todayStr=today.toISOString().slice(0,10);
+
+  function ds(d){
+    if(!d)return null;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function handleDay(dateStr){
+    if(!availDays.has(dateStr))return;
+    let wkId=null;
+    plan.forEach(wk=>wk.days.forEach(d=>{if(d.date===dateStr)wkId=wk.id;}));
+    if(wkId!==null){onMove(woId,sourceDayDate,sourceWeekId,dateStr,wkId);onClose();}
+  }
+
+  function prevMonth(){if(viewMonth===0){setViewMonth(11);setViewYear(y=>y-1);}else setViewMonth(m=>m-1);}
+  function nextMonth(){if(viewMonth===11){setViewMonth(0);setViewYear(y=>y+1);}else setViewMonth(m=>m+1);}
+
   return(
     <div className="modal-bg" onClick={onClose}>
-      <div className="modal-sheet" onClick={e=>e.stopPropagation()} style={{maxHeight:'70vh'}}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()} style={{maxHeight:'85vh'}}>
         <div style={{padding:'16px 18px',borderBottom:'1px solid var(--border)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:800}}>Training verschieben</div>
           <button className="ibtn" onClick={onClose}>×</button>
         </div>
-        <div style={{padding:16,display:'flex',flexDirection:'column',gap:6,overflowY:'auto'}}>
-          {plan.map(wk=>wk.days.map(d=>{
-            if(d.date===sourceDayDate)return null;
-            return(
-              <button key={d.date} onClick={()=>{onMove(woId,sourceDayDate,sourceWeekId,d.date,wk.id);onClose();}}
-                style={{padding:'10px 14px',background:'var(--s2)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text)',cursor:'pointer',textAlign:'left',fontSize:13,fontWeight:500,transition:'border-color .15s'}}
-                onMouseEnter={e=>e.target.style.borderColor='var(--orange)'}
-                onMouseLeave={e=>e.target.style.borderColor='var(--border)'}>
-                <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700}}>{d.label}</span>
-                <span style={{fontSize:11,color:'var(--td)',marginLeft:8}}>{wk.label}</span>
-              </button>
-            );
-          }))}
+        <div style={{padding:16}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+            <button onClick={prevMonth} className="ibtn" style={{fontSize:20,fontWeight:300}}>‹</button>
+            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:17,fontWeight:800,letterSpacing:'.04em'}}>{MONTHS[viewMonth]} {viewYear}</div>
+            <button onClick={nextMonth} className="ibtn" style={{fontSize:20,fontWeight:300}}>›</button>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>
+            {DOW.map(d=>(
+              <div key={d} style={{textAlign:'center',fontSize:10,fontWeight:700,color:'var(--tf)',letterSpacing:'.04em',padding:'3px 0',fontFamily:"'Barlow Condensed',sans-serif"}}>{d}</div>
+            ))}
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2}}>
+            {cells.map((d,i)=>{
+              if(!d)return <div key={`e${i}`}/>;
+              const dStr=ds(d);
+              const isToday=dStr===todayStr;
+              const isSource=dStr===sourceDayDate;
+              const isAvail=availDays.has(dStr);
+              return(
+                <div key={dStr}
+                  onClick={()=>handleDay(dStr)}
+                  style={{
+                    aspectRatio:'1',display:'flex',alignItems:'center',justifyContent:'center',
+                    borderRadius:'50%',fontSize:13,
+                    fontWeight:isAvail||isToday?700:400,
+                    cursor:isAvail&&!isSource?'pointer':'default',
+                    background:isToday?'rgba(249,115,22,.18)':isSource?'rgba(232,234,240,.04)':isAvail?'rgba(59,111,212,.18)':'transparent',
+                    border:isToday?'2px solid #F97316':isSource?'1px solid rgba(232,234,240,.12)':'1px solid transparent',
+                    color:isSource?'rgba(232,234,240,.18)':isAvail?'var(--text)':'rgba(232,234,240,.2)',
+                    transition:'all .1s',
+                  }}>
+                  {d.getDate()}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{marginTop:14,display:'flex',gap:16,fontSize:11,color:'var(--tf)'}}>
+            <span><span style={{color:'#F97316'}}>●</span> Heute</span>
+            <span><span style={{color:'#3B6FD4'}}>●</span> Verfügbar</span>
+          </div>
         </div>
       </div>
     </div>
@@ -876,7 +940,7 @@ function App(){
   return(
     <div style={{minHeight:'100vh',background:'var(--bg)'}}>
       {/* ── HEADER ─────────────────────────────────── */}
-      <div style={{position:'sticky',top:0,zIndex:50,background:'rgba(7,8,9,.97)',backdropFilter:'blur(14px)',borderBottom:'1px solid var(--border)'}}>
+      <div style={{position:'sticky',top:0,zIndex:50,background:'rgba(7,8,9,.97)',backdropFilter:'blur(14px)',borderBottom:'1px solid var(--border)',paddingTop:'env(safe-area-inset-top)'}}>
         <div style={{maxWidth:900,margin:'0 auto',padding:'11px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <AneoBrand size={30}/>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
