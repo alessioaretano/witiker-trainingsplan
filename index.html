@@ -230,8 +230,8 @@ const day =(date,label,workouts)=>({date,label,workouts:[...workouts]});
    KW18: 130km (+20%, Peak) → KW19: 65km (Taper) → Race: 22km
    ══════════════════════════════════════════════════ */
 const INIT_WEEKS=[
-  // KW17: 108km → 15+14+15+(15+1)+13+23+12 = 108 ✓ (Mi/Do auf 15km, 1km → Sa/2nd)
-  {id:2,label:'KW17',name:'Aufbau I',dateRange:'20.–26. Apr',targetKm:108,color:'#F97316',phase:'Aufbau',days:[
+  // KW17: 104km → 15+14+14+14+13+22+12 = 104 (Mi/Do auf 14km gekappt)
+  {id:2,label:'KW17',name:'Aufbau I',dateRange:'20.–26. Apr',targetKm:104,color:'#F97316',phase:'Aufbau',days:[
     day('2026-04-20','Mo 20. Apr',[
       run('r2-1','Easy Run',15,96,'Z1–Z2','Wocheneinstieg. HR <156bpm. Erholung nach B2B prüfen – bei starker Ermüdung 2km kürzen.',['Easy']),
       str('s2-1','A'),
@@ -242,13 +242,12 @@ const INIT_WEEKS=[
       mob('m2-2'),
     ]),
     day('2026-04-22','Mi 22. Apr',[
-      run('r2-3','Easy + Power Hike',15,99,'Z1–Z2','Easy mit 35 Min Power Hike-Block. Hike-Schwelle testen: ab welchem Anstieg ist schnelles Gehen effizienter als Joggen? Pace notieren. (1km → Sa)',['Easy','PowerHike']),
+      run('r2-3','Easy + Power Hike',14,92,'Z1–Z2','Easy mit 35 Min Power Hike-Block. Hike-Schwelle testen: ab welchem Anstieg ist schnelles Gehen effizienter als Joggen? Pace notieren.',['Easy','PowerHike']),
       str('s2-2','B'),
       mob('m2-3'),
     ]),
     day('2026-04-23','Do 23. Apr',[
-      run('r2-4','Easy Run',15,96,'Z1–Z2','Volumen-Tag. HR <158bpm. Gleichmässig durch.',['Easy']),
-      run('r2-4b','Easy Run (Abend)',1,7,'Z1','1km Spill-over abends – sehr locker.',['Easy']),
+      run('r2-4','Easy Run',14,90,'Z1–Z2','Volumen-Tag. HR <158bpm. Gleichmässig durch.',['Easy']),
       mob('m2-4'),
     ]),
     day('2026-04-24','Fr 24. Apr',[
@@ -257,7 +256,7 @@ const INIT_WEEKS=[
       mob('m2-fr'),
     ]),
     day('2026-04-25','Sa 25. Apr',[
-      run('r2-6','Uetliberg – Downhill Progressiv',23,159,'Z1–Z3','6–7 Runden. Erste 3–4 kontrolliert. Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Power Hike konsequent bergauf. Zeit pro Runde notieren → Benchmark für KW18-Simulation. (+1km Spill Mi)',['Downhill','PowerHike']),
+      run('r2-6','Uetliberg – Downhill Progressiv',22,152,'Z1–Z3','6–7 Runden. Erste 3–4 kontrolliert. Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Power Hike konsequent bergauf. Zeit pro Runde notieren → Benchmark für KW18-Simulation.',['Downhill','PowerHike']),
       mob('m2-5'),
     ]),
     day('2026-04-26','So 26. Apr',[
@@ -266,27 +265,24 @@ const INIT_WEEKS=[
     ]),
   ]},
 
-  // KW18: Peak → Mo/Mi/Di auf 15km (Kraft→Sa, kein Kraft→2nd); Do 15km+3km; Sim 5×6.706+6km=39.5km
-  // 15+(15+1)+15+(15+3)+13+39.5+25 = 141.5km
-  {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:142,color:'#F87171',phase:'Peak',days:[
+  // KW18: 130km → 14+16+14+15+13+37.5+20 = 129.5 ✓ (Mo/Mi 14km, Di 16km Intervalle, So 20km)
+  {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:130,color:'#F87171',phase:'Peak',days:[
     day('2026-04-27','Mo 27. Apr',[
-      run('r3-1','Easy Run',15,96,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm. Gut essen und trinken. (3km → Sa)',['Easy']),
+      run('r3-1','Easy Run',14,90,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm. Gut essen und trinken.',['Easy']),
       str('s3-1','A'),
       mob('m3-1'),
     ]),
     day('2026-04-28','Di 28. Apr',[
-      run('r3-2','Hill Intervalle – Letzte Intensität',15,84,'Z3–Z4','15 Min WU. 8 × (75s bergauf explosiv Z4 / zurückgehen Z1). 15 Min CD. Letzte harte Einheit der Saison. Danach kein Z4+ mehr bis Rennen.',['Hills','Intervalle','Speed']),
-      run('r3-2b','Easy Run (Abend)',1,7,'Z1','1km Spill-over abends – sehr locker.',['Easy']),
+      run('r3-2','Hill Intervalle – Letzte Intensität',16,90,'Z3–Z4','15 Min WU. 8 × (75s bergauf explosiv Z4 / zurückgehen Z1). 15 Min CD. Letzte harte Einheit der Saison. Danach kein Z4+ mehr bis Rennen.',['Hills','Intervalle','Speed']),
       mob('m3-2'),
     ]),
     day('2026-04-29','Mi 29. Apr',[
-      run('r3-3','Easy + Power Hike',15,99,'Z1–Z2','Easy mit 45 Min Power Hike. Hike-Pace auf definiertem Hügel dokumentieren. Schwellenpunkt bestimmen. (3km → Sa)',['Easy','PowerHike']),
+      run('r3-3','Easy + Power Hike',14,92,'Z1–Z2','Easy mit 45 Min Power Hike. Hike-Pace auf definiertem Hügel dokumentieren. Schwellenpunkt bestimmen.',['Easy','PowerHike']),
       str('s3-2','B'),
       mob('m3-3'),
     ]),
     day('2026-04-30','Do 30. Apr',[
       run('r3-4','Easy Run',15,96,'Z1–Z2','Grosser Volumen-Tag. Locker. Gut trinken und essen.',['Easy']),
-      run('r3-4b','Easy Run (Abend)',3,20,'Z1','3km Spill-over abends – sehr locker, Beine drehen.',['Easy']),
       mob('m3-4'),
     ]),
     day('2026-05-01','Fr 1. Mai',[
@@ -295,11 +291,11 @@ const INIT_WEEKS=[
       mob('m3-fr'),
     ]),
     day('2026-05-02','Sa 2. Mai',[
-      run('r3-6','Witiker Simulation',39.5,278,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde = 33.5km, 125Hm) + 6km Easy Spill-over (Mo+Mi). Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
+      run('r3-6','Witiker Simulation',37.5,265,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde = 33.5km, 125Hm) + 4km Easy. Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
       mob('m3-5'),
     ]),
     day('2026-05-03','So 3. Mai',[
-      run('r3-7','Long Run – Peak Abschluss',25,165,'Z1–Z2','Längster Lauf der Vorbereitung. Z1–Z2, egal wie langsam. Ernährung alle 30–35 Min. HR <155bpm. Danach beginnt Ramp-Down. Kein Druck – Beine bewegen, nicht kämpfen.',['Long','Easy','B2B','Peak']),
+      run('r3-7','Long Run – Peak Abschluss',20,132,'Z1–Z2','B2B nach Simulation. Z1–Z2, egal wie langsam. Ernährung alle 30–35 Min. HR <155bpm. Danach beginnt Ramp-Down. Kein Druck – Beine bewegen, nicht kämpfen.',['Long','Easy','B2B','Peak']),
       mob('m3-6'),
     ]),
   ]},
@@ -313,7 +309,7 @@ const INIT_WEEKS=[
       mob('m4-1'),
     ]),
     day('2026-05-05','Di 5. Mai',[
-      run('r4-2','Letzte Speed-Session',12,68,'Z2–Z3','10 Min WU. 4 × (3 Min Tempo Z3 / 2 Min easy Z1). 10 Min CD. Letzte Intensität der Saison. Gefühl, nicht Zeit. Danach kein Z3+ mehr bis Rennen.',['Tempo','Speed']),
+      run('r4-2','Kontrollierten Fartlek – Z3 Cap',12,68,'Z2–Z3','10 Min WU. 4 × (3 Min Tempo Z3 / 2 Min easy Z1). 10 Min CD. Z3 HART DECKELN – kein Z4-Drift. Gefühl, nicht Zeit. Letzte Intensität der Saison. Danach kein Z3+ mehr bis Rennen.',['Tempo','Speed']),
       mob('m4-2'),
     ]),
     day('2026-05-06','Mi 6. Mai',[
@@ -783,15 +779,15 @@ function ZonesTab(){
 /* ── OVERVIEW TAB ────────────────────────────────── */
 function OverviewTab({plan}){
   const phases=[
-    {kw:'KW17',name:'Aufbau I',      km:108, desc:'Fartlek Di. Downhill Progressiv Sa (23km). Max 15km Mo–Fr.'},
-    {kw:'KW18',name:'Peak',          km:142, desc:'Letzte Intensität Di. Witiker Simulation Sa (39.5km). Nacht-Sim Fr. Max 15km Mo–Fr.'},
+    {kw:'KW17',name:'Aufbau I',      km:104, desc:'Fartlek Di. Downhill Progressiv Sa (22km). Max 14km Easy-Tage.'},
+    {kw:'KW18',name:'Peak',          km:130, desc:'Hill Intervalle Di (16km). Witiker Simulation Sa (37.5km). Nacht-Sim Fr. So 20km B2B.'},
     {kw:'KW19',name:'Taper',         km:65,  desc:'10 Tage Taper. Letzte Speed Di. Ab Mi nur Easy.'},
     {kw:'Race', name:'Race Week',    km:22,  desc:'Shake-Outs. Ernährung. Crew-Briefing. Schlafen.'},
   ];
   return(
     <div className="fi">
       <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:28,fontWeight:900,marginBottom:4}}>ÜBERSICHT</div>
-      <div style={{fontSize:13,color:'var(--td)',marginBottom:20}}>4 Wochen · 337 km verbleibend · Ziel: 62+ Runden</div>
+      <div style={{fontSize:13,color:'var(--td)',marginBottom:20}}>4 Wochen · 321 km verbleibend · Ziel: 62+ Runden</div>
       <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:24}}>
         {phases.map((p,i)=>(
           <div key={i} style={{background:'var(--s1)',border:'1px solid var(--border)',borderRadius:10,padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
@@ -807,8 +803,8 @@ function OverviewTab({plan}){
         <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,fontWeight:800,marginBottom:12}}>KERN-ENTSCHEIDUNGEN</div>
         {[
           ['Max 15km Mo–Fr','Zeitlimit unter der Woche. Überschuss → Samstag oder 2. Abend-Session (wenn kein Kraft)'],
-          ['KW17: 108km','Fartlek Di. Downhill Progressiv Sa 23km. Kraft A/B/C.'],
-          ['KW18: 142km (Peak)','Witiker Simulation Sa 39.5km (5 Runden + 6km Spill). Nacht-Sim Fr. Letzte Intensität Di.'],
+          ['KW17: 104km','Fartlek Di. Downhill Progressiv Sa 22km. Easy-Tage max 14km.'],
+          ['KW18: 130km (Peak)','Witiker Simulation Sa 37.5km (5 Runden). Nacht-Sim Fr. Hill Intervalle Di 16km. So 20km B2B.'],
           ['KW19: 65km (Taper)','10 Tage Taper ab Mo. Letzte Speed Di. Ab Mi nur Easy + Shake-outs.'],
           ['Witiker Simulation Sa KW18','39.5km / 5 Runden auf Originalstrecke, Ernährungstest, Crew-Protokoll'],
           ['HR-Zonen kalibriert','HRmax 198 – Z2 = 129–158bpm. Alle Einheiten HR-geführt'],
