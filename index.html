@@ -199,6 +199,7 @@ const MOB=[
   {id:'m4',icon:'🌍',n:"World's Greatest Stretch",dur:'5×/Seite',    focus:'Hüftbeuger, Thorax',  d:'Ausfallschritt: Hand neben Fuss. Arm nach oben aufdrehen. Dann Ellbogen zum Boden. 3s pro Position.',yt:'worlds greatest stretch tutorial'},
   {id:'m5',icon:'🛋️',n:'Figure 4 Stretch',        dur:'60s/Seite',   focus:'Gluteus, Piriformis', d:'Rücken. Knöchel auf anderes Knie. Bein zur Brust ziehen. Fuss flexieren. Variation: Bein an Wand.',yt:'figure four supine glute stretch'},
   {id:'m6',icon:'🦵',n:'Quad Stretch (liegend)',   dur:'60s/Seite',   focus:'Quadrizeps, Knie',    d:'Seitlich liegen. Oberes Knie beugen, Fuss zum Gesäss. Hüfte leicht nach vorne stossen. Langsam.',yt:'quad stretch lying down tutorial'},
+  {id:'m7',icon:'🧱',n:'Couch Stretch',            dur:'90s/Seite',   focus:'Hüftbeuger, Quadrizeps',d:'Rücken zur Wand. Knie des hinteren Beins am Boden, Schienbein anlehnen an die Wand. Vorderes Bein 90° nach vorne (Ausfallschritt-Position). Hüfte langsam nach vorne-unten drücken. Gluteus des hinteren Beins aktiv anspannen. OKörper aufrecht – nicht nach vorne lehnen.',yt:'couch stretch hip flexor wall tutorial'},
 ];
 
 /* ── PLAN FACTORY ────────────────────────────────── */
@@ -237,10 +238,11 @@ const INIT_WEEKS=[
     day('2026-04-24','Fr 24. Apr',[
       run('r2-5','Easy Run',13,84,'Z1–Z2','Locker. Krafteinheit heute – Beine schonen vor Sa/So.',['Easy']),
       str('s2-3','C'),
+      mob('m2-fr'),
     ]),
     day('2026-04-25','Sa 25. Apr',[
       run('r2-6','Uetliberg – Downhill Progressiv',22,152,'Z1–Z3','6–7 Runden. Erste 3–4 kontrolliert. Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Power Hike konsequent bergauf. Zeit pro Runde notieren → Benchmark für KW18-Simulation.',['Downhill','PowerHike']),
-      mob('m2-5','Mobility 20 Min (Quad + Hüfte)'),
+      mob('m2-5'),
     ]),
     day('2026-04-26','So 26. Apr',[
       run('r2-7','Long Run Easy',12,78,'Z1–Z2','B2B mit Samstag. Easy. Ermüdungsresistenz-Einheit. HR <150bpm. Ernährung alle 40 Min testen.',['Easy','Long','B2B']),
@@ -273,10 +275,11 @@ const INIT_WEEKS=[
     day('2026-05-01','Fr 1. Mai',[
       run('r3-5','Early Morning – Nacht-Simulation 1',13,85,'Z1–Z2','FRÜHSTART 04:30–05:00 UHR. Stirnlampe obligatorisch. Erste Dunkel/Morgendämmerungs-Simulation. Gleiche Intensität – nur zeitlich verschoben. Gear-Test.',['Easy','NachtSimu']),
       str('s3-3','C','leichter'),
+      mob('m3-fr'),
     ]),
     day('2026-05-02','Sa 2. Mai',[
       run('r3-6','Witiker Simulation',37.5,265,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde = 33.5km, 125Hm) + 4km Easy Spill-over (Mo+Mi). Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
-      mob('m3-5','Mobility 20 Min (Race Recovery)'),
+      mob('m3-5'),
     ]),
     day('2026-05-03','So 3. Mai',[
       run('r3-7','Long Run – Peak Abschluss',25,165,'Z1–Z2','Längster Lauf der Vorbereitung. Z1–Z2, egal wie langsam. Ernährung alle 30–35 Min. HR <155bpm. Danach beginnt Ramp-Down. Kein Druck – Beine bewegen, nicht kämpfen.',['Long','Easy','B2B','Peak']),
@@ -306,7 +309,7 @@ const INIT_WEEKS=[
     ]),
     day('2026-05-08','Fr 8. Mai',[
       run('r4-5','Easy Run',7,46,'Z1','7km locker. HR <133bpm.',['Easy','Taper']),
-      mob('m4-5','Mobility 20 Min (Hüfte + Quad)'),
+      mob('m4-5'),
     ]),
     day('2026-05-09','Sa 9. Mai',[
       run('r4-6','Witiker Strecke – Gear Check',8,58,'Z1','1–2 lockere Runden auf der Originalstrecke. Schuhe, Socken, Stirnlampe, Vest checken. Kein Tempo – nur Gefühl und Gear.',['Easy','Taper']),
@@ -321,15 +324,15 @@ const INIT_WEEKS=[
   {id:5,label:'Race',name:'Race Week',dateRange:'11.–14. Mai',targetKm:22,color:'#FBBF24',phase:'Race',days:[
     day('2026-05-11','Mo 11. Mai',[
       run('r5-1','Easy Shake-Out',8,50,'Z1','Locker. HR <130bpm. Crew-Briefing finalisieren. Packliste abhaken.',['Easy','Taper']),
-      mob('m5-1','Mobility 20 Min (Hüfte + Waden)'),
+      mob('m5-1'),
     ]),
     day('2026-05-12','Di 12. Mai',[
       run('r5-2','Easy Shake-Out',8,50,'Z1','8km locker. Gear nochmals tragen – alles sitzt? HR <130bpm.',['Easy','Taper']),
-      mob('m5-2','Mobility 15 Min'),
+      mob('m5-2'),
     ]),
     day('2026-05-13','Mi 13. Mai',[
       run('r5-3','Pre-Race Run',6,38,'Z1','6km. Beine locker halten. Heute: Kohlenhydrate laden, früh schlafen (22:00). Kein Stress.',['Easy','Taper']),
-      mob('m5-3','Mobility 10 Min (Pre-Race)'),
+      mob('m5-3'),
     ]),
     day('2026-05-14','Do 14. Mai',[race()]),
   ]},
@@ -913,6 +916,7 @@ function App(){
       });
       const runTypes=['Run','TrailRun','Hike','Walk','VirtualRun','NordicSki'];
       const strengthTypes=['WeightTraining','Workout','Crossfit','RockClimbing'];
+      const mobilityTypes=['Yoga','Pilates','Stretching','MindAndBody'];
       // Match to plan
       const newCompleted={...completed};
       const newActual={};
@@ -931,6 +935,10 @@ function App(){
           }
           if(wo.type==='strength'){
             const match=dayActs.find(a=>strengthTypes.includes(a.type));
+            if(match)newCompleted[wo.id]=true;
+          }
+          if(wo.type==='mobility'){
+            const match=dayActs.find(a=>mobilityTypes.includes(a.type));
             if(match)newCompleted[wo.id]=true;
           }
         });
