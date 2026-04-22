@@ -97,6 +97,7 @@
     .ibtn:hover{border-color:var(--borderS);color:var(--text);}
     /* Drag move indicator */
     .move-hint{font-size:10px;color:var(--td);letter-spacing:.04em;text-align:center;padding:6px 0 0;font-family:'Barlow Condensed',sans-serif;}
+    @keyframes spin{to{transform:rotate(360deg);}}
   </style>
 </head>
 <body>
@@ -369,6 +370,67 @@ const W_CFG={
 
 function kmDoneWeek(week,completed){
   return week.days.reduce((a,d)=>a+d.workouts.filter(w=>w.type==='run'&&completed[w.id]).reduce((b,w)=>b+(w.km||0),0),0);
+}
+
+/* ── STRAVA ──────────────────────────────────────── */
+const SK={cid:'aneo_sc',csec:'aneo_ss',token:'aneo_st',actual:'aneo_sa'};
+function stravaAuthUrl(cid){
+  const p=new URLSearchParams({client_id:cid,redirect_uri:window.location.origin+window.location.pathname,response_type:'code',approval_prompt:'auto',scope:'activity:read_all'});
+  return `https://www.strava.com/oauth/authorize?${p}`;
+}
+async function stravaPost(body){
+  const r=await fetch('https://www.strava.com/oauth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
+}
+async function stravaGet(path,tok){
+  const r=await fetch(`https://www.strava.com/api/v3${path}`,{headers:{Authorization:`Bearer ${tok}`}});
+  if(!r.ok)throw new Error(r.status);
+  return r.json();
+}
+
+function StravaSetupModal({onClose,onConnect}){
+  const [cid,setCid]=useState(()=>localStorage.getItem(SK.cid)||'');
+  const [csec,setCsec]=useState(()=>localStorage.getItem(SK.csec)||'');
+  function connect(){
+    if(!cid.trim()||!csec.trim())return;
+    localStorage.setItem(SK.cid,cid.trim());
+    localStorage.setItem(SK.csec,csec.trim());
+    onConnect(cid.trim());
+    onClose();
+  }
+  const inp={background:'var(--s3)',border:'1px solid var(--borderS)',color:'var(--text)',borderRadius:8,padding:'10px 12px',fontSize:14,width:'100%',outline:'none',fontFamily:"'Barlow',sans-serif"};
+  return(
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()}>
+        <div style={{padding:'18px 18px 0',borderBottom:'1px solid var(--border)',position:'sticky',top:0,background:'var(--s1)',zIndex:1}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:20,fontWeight:800,color:'#FC4C02',letterSpacing:'.02em'}}>STRAVA VERBINDEN</div>
+            <button className="ibtn" onClick={onClose}>×</button>
+          </div>
+        </div>
+        <div style={{padding:18,display:'flex',flexDirection:'column',gap:14}}>
+          <div style={{background:'var(--s2)',borderRadius:8,padding:'11px 14px',border:'1px solid var(--border)',fontSize:12,color:'var(--td)',lineHeight:1.75}}>
+            <b style={{color:'var(--text)'}}>Setup (einmalig):</b><br/>
+            1. Öffne <b style={{color:'#FC4C02'}}>strava.com/settings/api</b><br/>
+            2. Erstelle eine App (Name: egal)<br/>
+            3. Authorization Callback Domain: <b style={{color:'var(--text)'}}>aneo.club</b><br/>
+            4. Kopiere Client ID + Client Secret hierhin
+          </div>
+          <div>
+            <div style={{fontSize:10,fontWeight:700,color:'var(--tf)',letterSpacing:'.07em',textTransform:'uppercase',marginBottom:6}}>Client ID</div>
+            <input style={inp} placeholder="12345" value={cid} onChange={e=>setCid(e.target.value)} inputMode="numeric"/>
+          </div>
+          <div>
+            <div style={{fontSize:10,fontWeight:700,color:'var(--tf)',letterSpacing:'.07em',textTransform:'uppercase',marginBottom:6}}>Client Secret</div>
+            <input style={inp} placeholder="abc123..." value={csec} onChange={e=>setCsec(e.target.value)} type="password"/>
+          </div>
+          <button onClick={connect} disabled={!cid.trim()||!csec.trim()} style={{padding:'13px',background:'rgba(252,76,2,.12)',border:'1px solid rgba(252,76,2,.35)',color:'#FC4C02',borderRadius:8,cursor:'pointer',fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:700,letterSpacing:'.05em',opacity:(!cid.trim()||!csec.trim())?.4:1}}>
+            MIT STRAVA VERBINDEN →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /* ── STRENGTH MODAL ──────────────────────────────── */
@@ -761,6 +823,11 @@ function App(){
   });
   const [modal,setModal]=useState(null);
   const [moveModal,setMoveModal]=useState(null);
+  const [stravaSetup,setStravaSetup]=useState(false);
+  const [stravaToken,setStravaToken]=useState(()=>{try{return JSON.parse(localStorage.getItem(SK.token)||'null');}catch(e){return null;}});
+  const [stravaActual,setStravaActual]=useState(()=>{try{return JSON.parse(localStorage.getItem(SK.actual)||'{}');}catch(e){return{};}});
+  const [syncing,setSyncing]=useState(false);
+  const [lastSync,setLastSync]=useState(null);
 
   // ── PERSISTENT STATE: completed ───────────────────
   const [completed,setCompleted]=useState(()=>{
@@ -791,14 +858,85 @@ function App(){
   // Auto-jump to today's week on first load, or next upcoming week
   useEffect(()=>{
     const todayStr=new Date().toISOString().slice(0,10);
-    // First try exact match
     let idx=plan.findIndex(wk=>wk.days.some(d=>d.date===todayStr));
-    // If no exact match, find the week containing the next upcoming day
-    if(idx<0){
-      idx=plan.findIndex(wk=>wk.days.some(d=>d.date>=todayStr));
-    }
+    if(idx<0){idx=plan.findIndex(wk=>wk.days.some(d=>d.date>=todayStr));}
     if(idx>=0)setActiveWeek(idx);
   },[]);// eslint-disable-line
+
+  // Strava OAuth callback handler
+  useEffect(()=>{
+    const params=new URLSearchParams(window.location.search);
+    const code=params.get('code');
+    if(!code)return;
+    window.history.replaceState({},'',window.location.pathname);
+    const cid=localStorage.getItem(SK.cid);
+    const csec=localStorage.getItem(SK.csec);
+    if(!cid||!csec){setStravaSetup(true);return;}
+    (async()=>{
+      try{
+        const data=await stravaPost({client_id:cid,client_secret:csec,code,grant_type:'authorization_code'});
+        if(data.access_token){
+          const tok={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:data.expires_at};
+          localStorage.setItem(SK.token,JSON.stringify(tok));
+          setStravaToken(tok);
+          doSync(tok,cid,csec);
+        }else{alert('Strava: '+JSON.stringify(data));}
+      }catch(e){alert('Strava Verbindung fehlgeschlagen.');}
+    })();
+  },[]);// eslint-disable-line
+
+  async function doSync(tok,cid,csec){
+    setSyncing(true);
+    try{
+      let t=tok||stravaToken;
+      if(!t){setSyncing(false);setStravaSetup(true);return;}
+      // Refresh token if expired
+      if(t.expires_at*1000<Date.now()+60000){
+        const cidVal=cid||localStorage.getItem(SK.cid);
+        const csecVal=csec||localStorage.getItem(SK.csec);
+        const fresh=await stravaPost({client_id:cidVal,client_secret:csecVal,refresh_token:t.refresh_token,grant_type:'refresh_token'});
+        t={access_token:fresh.access_token,refresh_token:fresh.refresh_token,expires_at:fresh.expires_at};
+        localStorage.setItem(SK.token,JSON.stringify(t));
+        setStravaToken(t);
+      }
+      // Date range from plan
+      const allDates=plan.flatMap(wk=>wk.days.map(d=>d.date)).filter(Boolean).sort();
+      const after=Math.floor(new Date(allDates[0]).getTime()/1000)-86400;
+      const before=Math.floor(new Date(allDates[allDates.length-1]).getTime()/1000)+86400;
+      const acts=await stravaGet(`/athlete/activities?after=${after}&before=${before}&per_page=100`,t.access_token);
+      // Group by date
+      const byDate={};
+      const runTypes=['Run','TrailRun','Hike','Walk','VirtualRun','NordicSki'];
+      acts.filter(a=>runTypes.includes(a.type)).forEach(a=>{
+        const d=a.start_date_local.slice(0,10);
+        if(!byDate[d])byDate[d]=[];
+        byDate[d].push(a);
+      });
+      // Match to plan
+      const newCompleted={...completed};
+      const newActual={};
+      plan.forEach(wk=>wk.days.forEach(d=>{
+        const dayActs=byDate[d.date]||[];
+        d.workouts.forEach(wo=>{
+          if(wo.type!=='run'||!wo.km)return;
+          const planned=wo.km*1000;
+          // Best match: same day, ≥70% of planned km
+          const match=dayActs
+            .filter(a=>a.distance>=planned*0.7)
+            .sort((a,b)=>Math.abs(a.distance-planned)-Math.abs(b.distance-planned))[0];
+          if(match){
+            newCompleted[wo.id]=true;
+            newActual[wo.id]=Math.round(match.distance/100)/10;
+          }
+        });
+      }));
+      setCompleted(newCompleted);
+      setStravaActual(newActual);
+      localStorage.setItem(SK.actual,JSON.stringify(newActual));
+      setLastSync(new Date().toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'}));
+    }catch(e){alert('Sync fehlgeschlagen: '+e.message);}
+    setSyncing(false);
+  }
 
   // Drag state
   const [dragWo,setDragWo]=useState(null);
@@ -877,12 +1015,24 @@ function App(){
       <div style={{position:'sticky',top:0,zIndex:50,background:'rgba(7,8,9,.97)',backdropFilter:'blur(14px)',borderBottom:'1px solid var(--border)',paddingTop:'env(safe-area-inset-top)'}}>
         <div style={{maxWidth:900,margin:'0 auto',padding:'11px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <AneoBrand size={30}/>
-          <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
             <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,color:'var(--td)',letterSpacing:'.04em'}}>
               <span style={{color:'#F97316',fontWeight:800,fontSize:17}}>{daysLeft}</span> Tage bis Witikon
             </div>
+            {stravaToken?(
+              <button onClick={()=>doSync()} disabled={syncing}
+                style={{background:'rgba(252,76,2,.12)',border:'1px solid rgba(252,76,2,.35)',color:'#FC4C02',borderRadius:5,padding:'4px 9px',cursor:'pointer',fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:'.04em',display:'flex',alignItems:'center',gap:4}}>
+                <span style={{fontSize:12,display:'inline-block',animation:syncing?'spin 1s linear infinite':'none'}}>⟳</span>
+                {lastSync?lastSync:'Strava'}
+              </button>
+            ):(
+              <button onClick={()=>setStravaSetup(true)}
+                style={{background:'rgba(252,76,2,.08)',border:'1px solid rgba(252,76,2,.25)',color:'rgba(252,76,2,.7)',borderRadius:5,padding:'4px 9px',cursor:'pointer',fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:'.04em'}}>
+                Strava
+              </button>
+            )}
             <button
-              onClick={()=>{if(window.confirm('Alle Abhakungen und Verschiebungen zurücksetzen?')){localStorage.removeItem('aneo_completed');localStorage.removeItem('aneo_plan');window.location.reload();}}}
+              onClick={()=>{if(window.confirm('Alle Abhakungen und Verschiebungen zurücksetzen?')){localStorage.removeItem('aneo_completed');localStorage.removeItem('aneo_plan');localStorage.removeItem(SK.actual);window.location.reload();}}}
               style={{background:'rgba(232,234,240,.06)',border:'1px solid rgba(232,234,240,.12)',color:'rgba(232,234,240,.35)',borderRadius:5,padding:'4px 9px',cursor:'pointer',fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:'.04em'}}
               title="Fortschritt zurücksetzen">↺</button>
           </div>
@@ -1010,7 +1160,14 @@ function App(){
                             <div style={{flex:1,minWidth:0}}>
                               <div style={{display:'flex',alignItems:'center',gap:5}}>
                                 <span style={{fontSize:15,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{wo.title}</span>
-                                {wo.km&&<span style={{fontSize:13,color:'rgba(232,234,240,.6)',flexShrink:0,fontWeight:600}}>{wo.km}km</span>}
+                                {wo.km&&(stravaActual[wo.id]?(
+                                  <span style={{fontSize:12,flexShrink:0,fontWeight:700}}>
+                                    <span style={{color:'#FC4C02'}}>{stravaActual[wo.id]}</span>
+                                    <span style={{color:'rgba(232,234,240,.3)'}}>/{wo.km}km</span>
+                                  </span>
+                                ):(
+                                  <span style={{fontSize:13,color:'rgba(232,234,240,.6)',flexShrink:0,fontWeight:600}}>{wo.km}km</span>
+                                ))}
                                 {wo.routineKey&&<span style={{fontSize:11,fontWeight:800,color:ST[wo.routineKey]?.color,background:`${ST[wo.routineKey]?.color}20`,padding:'1px 5px',borderRadius:3,flexShrink:0}}>{wo.routineKey}</span>}
                               </div>
                               {wo.tags&&wo.tags.length>0&&(
@@ -1065,6 +1222,12 @@ function App(){
           plan={plan}
           onMove={moveWorkout}
           onClose={()=>setMoveModal(null)}
+        />
+      )}
+      {stravaSetup&&(
+        <StravaSetupModal
+          onClose={()=>setStravaSetup(false)}
+          onConnect={(cid)=>{window.location.href=stravaAuthUrl(cid);}}
         />
       )}
     </div>
