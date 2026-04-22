@@ -217,6 +217,9 @@ const MOB=[
   {id:'m7',icon:'🧱',n:'Couch Stretch',            dur:'90s/Seite',   focus:'Hüftbeuger, Quadrizeps',d:'Rücken zur Wand. Knie des hinteren Beins am Boden, Schienbein anlehnen an die Wand. Vorderes Bein 90° nach vorne (Ausfallschritt-Position). Hüfte langsam nach vorne-unten drücken. Gluteus des hinteren Beins aktiv anspannen. OKörper aufrecht – nicht nach vorne lehnen.',yt:'couch stretch hip flexor wall tutorial'},
 ];
 
+/* ── PLAN VERSION (bump when INIT_WEEKS changes) ──── */
+const PLAN_VERSION='v10';
+
 /* ── PLAN FACTORY ────────────────────────────────── */
 const run =(id,t,km,dur,hr,desc,tags)=>({id,type:'run',title:t,km,duration:dur,hr,description:desc,tags:tags||[]});
 const str =(id,k,note)=>({id,type:'strength',title:`Kraft ${k}${note?` (${note})`:''}`,routineKey:k});
@@ -265,15 +268,15 @@ const INIT_WEEKS=[
     ]),
   ]},
 
-  // KW18: 130km → 14+16+14+15+13+37.5+20 = 129.5 ✓ (Mo/Mi 14km, Di 16km Intervalle, So 20km)
-  {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:130,color:'#F87171',phase:'Peak',days:[
+  // KW18: 132km → 14+15+14+15+13+40.2+20 = 131.2 ✓ (Mo/Mi 14km, Di 15km, 6 Runden Sim, So 20km)
+  {id:3,label:'KW18',name:'Peak',dateRange:'27. Apr – 3. Mai',targetKm:132,color:'#F87171',phase:'Peak',days:[
     day('2026-04-27','Mo 27. Apr',[
       run('r3-1','Easy Run',14,90,'Z1–Z2','Start Peak-Phase. Puls führt. HR <158bpm. Gut essen und trinken.',['Easy']),
       str('s3-1','A'),
       mob('m3-1'),
     ]),
     day('2026-04-28','Di 28. Apr',[
-      run('r3-2','Hill Intervalle – Letzte Intensität',16,90,'Z3–Z4','15 Min WU. 8 × (75s bergauf explosiv Z4 / zurückgehen Z1). 15 Min CD. Letzte harte Einheit der Saison. Danach kein Z4+ mehr bis Rennen.',['Hills','Intervalle','Speed']),
+      run('r3-2','Hill Intervalle – Letzte Intensität',15,84,'Z3–Z4','15 Min WU. 8 × (75s bergauf explosiv Z4 / zurückgehen Z1). 15 Min CD. Letzte harte Einheit der Saison. Danach kein Z4+ mehr bis Rennen.',['Hills','Intervalle','Speed']),
       mob('m3-2'),
     ]),
     day('2026-04-29','Mi 29. Apr',[
@@ -291,7 +294,7 @@ const INIT_WEEKS=[
       mob('m3-fr'),
     ]),
     day('2026-05-02','Sa 2. Mai',[
-      run('r3-6','Witiker Simulation',37.5,265,'Z1–Z3','Vollsimulation auf der Originalstrecke. 5 Runden (6.706km/Runde = 33.5km, 125Hm) + 4km Easy. Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
+      run('r3-6','Witiker Simulation',40.2,315,'Z1–Z3','Vollsimulation auf der Originalstrecke. 6 Runden (6.706km/Runde = 40.2km, 125Hm/Runde). Timing pro Runde (Ziel <52 Min). Rennernährung testen: 200–250kcal/Runde, MNSTRY Carbmix. Nach Runde 3: kurze Pause (Crew-Simulation). Härtester Tag der Vorbereitung.',['Simulation','Downhill','PowerHike','Race-Specific']),
       mob('m3-5'),
     ]),
     day('2026-05-03','So 3. Mai',[
@@ -780,14 +783,14 @@ function ZonesTab(){
 function OverviewTab({plan}){
   const phases=[
     {kw:'KW17',name:'Aufbau I',      km:104, desc:'Fartlek Di. Downhill Progressiv Sa (22km). Max 14km Easy-Tage.'},
-    {kw:'KW18',name:'Peak',          km:130, desc:'Hill Intervalle Di (16km). Witiker Simulation Sa (37.5km). Nacht-Sim Fr. So 20km B2B.'},
+    {kw:'KW18',name:'Peak',          km:132, desc:'Hill Intervalle Di (15km). Witiker Simulation Sa (40.2km / 6 Runden). Nacht-Sim Fr. So 20km B2B.'},
     {kw:'KW19',name:'Taper',         km:65,  desc:'10 Tage Taper. Letzte Speed Di. Ab Mi nur Easy.'},
     {kw:'Race', name:'Race Week',    km:22,  desc:'Shake-Outs. Ernährung. Crew-Briefing. Schlafen.'},
   ];
   return(
     <div className="fi">
       <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:28,fontWeight:900,marginBottom:4}}>ÜBERSICHT</div>
-      <div style={{fontSize:13,color:'var(--td)',marginBottom:20}}>4 Wochen · 321 km verbleibend · Ziel: 62+ Runden</div>
+      <div style={{fontSize:13,color:'var(--td)',marginBottom:20}}>4 Wochen · 323 km verbleibend · Ziel: 62+ Runden</div>
       <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:24}}>
         {phases.map((p,i)=>(
           <div key={i} style={{background:'var(--s1)',border:'1px solid var(--border)',borderRadius:10,padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
@@ -804,7 +807,7 @@ function OverviewTab({plan}){
         {[
           ['Max 15km Mo–Fr','Zeitlimit unter der Woche. Überschuss → Samstag oder 2. Abend-Session (wenn kein Kraft)'],
           ['KW17: 104km','Fartlek Di. Downhill Progressiv Sa 22km. Easy-Tage max 14km.'],
-          ['KW18: 130km (Peak)','Witiker Simulation Sa 37.5km (5 Runden). Nacht-Sim Fr. Hill Intervalle Di 16km. So 20km B2B.'],
+          ['KW18: 132km (Peak)','Witiker Simulation Sa 40.2km (6 Runden). Nacht-Sim Fr. Hill Intervalle Di 15km. So 20km B2B.'],
           ['KW19: 65km (Taper)','10 Tage Taper ab Mo. Letzte Speed Di. Ab Mi nur Easy + Shake-outs.'],
           ['Witiker Simulation Sa KW18','39.5km / 5 Runden auf Originalstrecke, Ernährungstest, Crew-Protokoll'],
           ['HR-Zonen kalibriert','HRmax 198 – Z2 = 129–158bpm. Alle Einheiten HR-geführt'],
@@ -852,6 +855,12 @@ function App(){
   // ── PERSISTENT STATE: plan (workout order) ────────
   const [plan,setPlan]=useState(()=>{
     try{
+      const ver=localStorage.getItem('aneo_plan_ver');
+      if(ver!==PLAN_VERSION){
+        localStorage.removeItem('aneo_plan');
+        localStorage.setItem('aneo_plan_ver',PLAN_VERSION);
+        return INIT_WEEKS;
+      }
       const saved=localStorage.getItem('aneo_plan');
       return saved?JSON.parse(saved):INIT_WEEKS;
     }catch(e){return INIT_WEEKS;}
