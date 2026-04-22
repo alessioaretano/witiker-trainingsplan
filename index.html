@@ -904,29 +904,34 @@ function App(){
       const after=Math.floor(new Date(allDates[0]).getTime()/1000)-86400;
       const before=Math.floor(new Date(allDates[allDates.length-1]).getTime()/1000)+86400;
       const acts=await stravaGet(`/athlete/activities?after=${after}&before=${before}&per_page=100`,t.access_token);
-      // Group by date
+      // Group by date (all types)
       const byDate={};
-      const runTypes=['Run','TrailRun','Hike','Walk','VirtualRun','NordicSki'];
-      acts.filter(a=>runTypes.includes(a.type)).forEach(a=>{
+      acts.forEach(a=>{
         const d=a.start_date_local.slice(0,10);
         if(!byDate[d])byDate[d]=[];
         byDate[d].push(a);
       });
+      const runTypes=['Run','TrailRun','Hike','Walk','VirtualRun','NordicSki'];
+      const strengthTypes=['WeightTraining','Workout','Crossfit','RockClimbing'];
       // Match to plan
       const newCompleted={...completed};
       const newActual={};
       plan.forEach(wk=>wk.days.forEach(d=>{
         const dayActs=byDate[d.date]||[];
         d.workouts.forEach(wo=>{
-          if(wo.type!=='run'||!wo.km)return;
-          const planned=wo.km*1000;
-          // Best match: same day, ≥70% of planned km
-          const match=dayActs
-            .filter(a=>a.distance>=planned*0.7)
-            .sort((a,b)=>Math.abs(a.distance-planned)-Math.abs(b.distance-planned))[0];
-          if(match){
-            newCompleted[wo.id]=true;
-            newActual[wo.id]=Math.round(match.distance/100)/10;
+          if(wo.type==='run'&&wo.km){
+            const planned=wo.km*1000;
+            const match=dayActs
+              .filter(a=>runTypes.includes(a.type)&&a.distance>=planned*0.7)
+              .sort((a,b)=>Math.abs(a.distance-planned)-Math.abs(b.distance-planned))[0];
+            if(match){
+              newCompleted[wo.id]=true;
+              newActual[wo.id]=Math.round(match.distance/100)/10;
+            }
+          }
+          if(wo.type==='strength'){
+            const match=dayActs.find(a=>strengthTypes.includes(a.type));
+            if(match)newCompleted[wo.id]=true;
           }
         });
       }));
