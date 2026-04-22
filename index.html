@@ -218,7 +218,7 @@ const MOB=[
 ];
 
 /* ── PLAN VERSION (bump when INIT_WEEKS changes) ──── */
-const PLAN_VERSION='v10';
+const PLAN_VERSION='v11';
 
 /* ── PLAN FACTORY ────────────────────────────────── */
 const run =(id,t,km,dur,hr,desc,tags)=>({id,type:'run',title:t,km,duration:dur,hr,description:desc,tags:tags||[]});
@@ -229,12 +229,12 @@ const day =(date,label,workouts)=>({date,label,workouts:[...workouts]});
 
 /* ══════════════════════════════════════════════════
    TRAININGSPLAN – ÜBERARBEITET v4
-   KW15: 70km (absolviert) → KW16: 90km → KW17: 108km (+20%)
+   KW15: 70km (absolviert) → KW16: 90km → KW17: 111km
    KW18: 130km (+20%, Peak) → KW19: 65km (Taper) → Race: 22km
    ══════════════════════════════════════════════════ */
 const INIT_WEEKS=[
-  // KW17: 104km → 15+14+14+14+13+22+12 = 104 (Mi/Do auf 14km gekappt)
-  {id:2,label:'KW17',name:'Aufbau I',dateRange:'20.–26. Apr',targetKm:104,color:'#F97316',phase:'Aufbau',days:[
+  // KW17: 111km → 15+14+14+14+13+28.7+12 = 110.7 (Sa: 22km Uetliberg + 6.7km Witikon)
+  {id:2,label:'KW17',name:'Aufbau I',dateRange:'20.–26. Apr',targetKm:111,color:'#F97316',phase:'Aufbau',days:[
     day('2026-04-20','Mo 20. Apr',[
       run('r2-1','Easy Run',15,96,'Z1–Z2','Wocheneinstieg. HR <156bpm. Erholung nach B2B prüfen – bei starker Ermüdung 2km kürzen.',['Easy']),
       str('s2-1','A'),
@@ -259,7 +259,8 @@ const INIT_WEEKS=[
       mob('m2-fr'),
     ]),
     day('2026-04-25','Sa 25. Apr',[
-      run('r2-6','Uetliberg – Downhill Progressiv',22,152,'Z1–Z3','6–7 Runden. Erste 3–4 kontrolliert. Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Power Hike konsequent bergauf. Zeit pro Runde notieren → Benchmark für KW18-Simulation.',['Downhill','PowerHike']),
+      run('r2-6','Uetliberg – Downhill Progressiv',22,152,'Z1–Z3','Start Albisgüetli, steiler Weg direkt hoch. 0.86km / 200Hm pro Aufstieg. 6–7 Runden: Erste 3–4 kontrolliert (Power Hike bergauf konsequent). Letzte 2–3 etwas schneller bergab, Frequenz erhöhen. Zeit pro Runde notieren → Benchmark für KW18-Simulation.',['Downhill','PowerHike']),
+      run('r2-6b','Backyard Runde – Witikon',6.7,125,'Z1–Z2','1 Runde auf der Originalstrecke (6.706km / 125Hm). Lockeres Tempo. Kurs kennenlernen, Übergänge / Wendepunkte einprägen.',['Easy','Race-Specific']),
       mob('m2-5'),
     ]),
     day('2026-04-26','So 26. Apr',[
@@ -782,7 +783,7 @@ function ZonesTab(){
 /* ── OVERVIEW TAB ────────────────────────────────── */
 function OverviewTab({plan}){
   const phases=[
-    {kw:'KW17',name:'Aufbau I',      km:104, desc:'Fartlek Di. Downhill Progressiv Sa (22km). Max 14km Easy-Tage.'},
+    {kw:'KW17',name:'Aufbau I',      km:111, desc:'Fartlek Di. Downhill Progressiv Sa (22km, Albisgüetli) + Backyard Runde Witikon (6.7km). Max 14km Easy-Tage.'},
     {kw:'KW18',name:'Peak',          km:132, desc:'Hill Intervalle Di (15km). Witiker Simulation Sa (40.2km / 6 Runden). Nacht-Sim Fr. So 20km B2B.'},
     {kw:'KW19',name:'Taper',         km:65,  desc:'10 Tage Taper. Letzte Speed Di. Ab Mi nur Easy.'},
     {kw:'Race', name:'Race Week',    km:22,  desc:'Shake-Outs. Ernährung. Crew-Briefing. Schlafen.'},
@@ -806,7 +807,7 @@ function OverviewTab({plan}){
         <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,fontWeight:800,marginBottom:12}}>KERN-ENTSCHEIDUNGEN</div>
         {[
           ['Max 15km Mo–Fr','Zeitlimit unter der Woche. Überschuss → Samstag oder 2. Abend-Session (wenn kein Kraft)'],
-          ['KW17: 104km','Fartlek Di. Downhill Progressiv Sa 22km. Easy-Tage max 14km.'],
+          ['KW17: 111km','Fartlek Di. Downhill Progressiv Sa 22km (Albisgüetli) + Backyard Runde Witikon 6.7km. Easy-Tage max 14km.'],
           ['KW18: 132km (Peak)','Witiker Simulation Sa 40.2km (6 Runden). Nacht-Sim Fr. Hill Intervalle Di 15km. So 20km B2B.'],
           ['KW19: 65km (Taper)','10 Tage Taper ab Mo. Letzte Speed Di. Ab Mi nur Easy + Shake-outs.'],
           ['Witiker Simulation Sa KW18','39.5km / 5 Runden auf Originalstrecke, Ernährungstest, Crew-Protokoll'],
