@@ -844,6 +844,7 @@ function App(){
   const [stravaActual,setStravaActual]=useState(()=>{try{return JSON.parse(localStorage.getItem(SK.actual)||'{}');}catch(e){return{};}});
   const [syncing,setSyncing]=useState(false);
   const [lastSync,setLastSync]=useState(null);
+  const [syncError,setSyncError]=useState(null);
 
   // ── PERSISTENT STATE: completed ───────────────────
   const [completed,setCompleted]=useState(()=>{
@@ -913,13 +914,14 @@ function App(){
           localStorage.setItem(SK.token,JSON.stringify(tok));
           setStravaToken(tok);
           doSync(tok,cid,csec);
-        }else{alert('Strava: '+JSON.stringify(data));}
+        }else{setSyncError('Strava Auth: '+JSON.stringify(data));}
       }catch(e){alert('Strava Verbindung fehlgeschlagen.');}
     })();
   },[]);// eslint-disable-line
 
   async function doSync(tok,cid,csec){
     setSyncing(true);
+    setSyncError(null);
     try{
       let t=tok||stravaToken;
       if(!t){setSyncing(false);setStravaSetup(true);return;}
@@ -977,7 +979,7 @@ function App(){
       setStravaActual(newActual);
       localStorage.setItem(SK.actual,JSON.stringify(newActual));
       setLastSync(new Date().toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'}));
-    }catch(e){alert('Sync fehlgeschlagen: '+e.message);}
+    }catch(e){setSyncError(e.message||'Sync fehlgeschlagen');}
     setSyncing(false);
   }
 
@@ -1087,6 +1089,12 @@ function App(){
           ))}
         </div>
       </div>
+
+      {syncError&&(
+        <div onClick={()=>setSyncError(null)} style={{background:'rgba(248,113,113,.12)',borderBottom:'1px solid rgba(248,113,113,.35)',padding:'8px 16px',fontSize:12,color:'#F87171',cursor:'pointer',textAlign:'center'}}>
+          ⚠ Strava Sync Fehler: {syncError} · Tippen zum Schliessen
+        </div>
+      )}
 
       <div style={{maxWidth:900,margin:'0 auto',padding:'18px 16px',paddingBottom:'max(120px, calc(90px + env(safe-area-inset-bottom)))'}}>
 
