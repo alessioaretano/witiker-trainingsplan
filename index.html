@@ -1075,9 +1075,9 @@ function App(){
               </button>
             )}
             <button
-              onClick={()=>{if(window.confirm('Alle Abhakungen und Verschiebungen zurücksetzen?')){localStorage.removeItem('aneo_completed');localStorage.removeItem('aneo_plan');localStorage.removeItem(SK.actual);window.location.reload();}}}
+              onClick={()=>window.location.reload()}
               style={{background:'rgba(232,234,240,.06)',border:'1px solid rgba(232,234,240,.12)',color:'rgba(232,234,240,.35)',borderRadius:5,padding:'4px 9px',cursor:'pointer',fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:'.04em'}}
-              title="Fortschritt zurücksetzen">↺</button>
+              title="App neu laden">↺</button>
           </div>
         </div>
         {/* Desktop nav */}
