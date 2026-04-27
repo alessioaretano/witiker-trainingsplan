@@ -938,7 +938,14 @@ function App(){
       const allDates=plan.flatMap(wk=>wk.days.map(d=>d.date)).filter(Boolean).sort();
       const after=Math.floor(new Date(allDates[0]).getTime()/1000)-86400;
       const before=Math.floor(new Date(allDates[allDates.length-1]).getTime()/1000)+86400;
-      const acts=await stravaGet(`/athlete/activities?after=${after}&before=${before}&per_page=100`,t.access_token);
+      // Strava liefert max. 100 Aktivitäten pro Seite → paginieren bis alles geladen
+      const acts=[];
+      for(let page=1;page<=20;page++){
+        const batch=await stravaGet(`/athlete/activities?after=${after}&before=${before}&per_page=100&page=${page}`,t.access_token);
+        if(!batch||!batch.length)break;
+        acts.push(...batch);
+        if(batch.length<100)break;
+      }
       // Group by date (all types)
       const byDate={};
       acts.forEach(a=>{
