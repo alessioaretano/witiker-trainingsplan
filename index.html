@@ -393,7 +393,17 @@ function kmDoneWeek(week,completed){
 }
 
 /* ── STRAVA ──────────────────────────────────────── */
-const SK={cid:'aneo_sc',csec:'aneo_ss',token:'aneo_st',actual:'aneo_sa'};
+const SK={cid:'aneo_sc',csec:'aneo_ss',token:'aneo_st',actual:'aneo_sa',extras:'aneo_se'};
+const STRAVA_RUN=['Run','TrailRun','Hike','Walk','VirtualRun','NordicSki'];
+const STRAVA_STRENGTH=['WeightTraining','Workout','Crossfit','RockClimbing'];
+const STRAVA_MOBILITY=['Yoga','Pilates','Stretching','MindAndBody'];
+const STRAVA_LABEL={Run:'Lauf',TrailRun:'Trail',Walk:'Walk',Hike:'Wanderung',VirtualRun:'V.Lauf',NordicSki:'Ski',WeightTraining:'Kraft',Workout:'Workout',Crossfit:'Crossfit',RockClimbing:'Klettern',Yoga:'Yoga',Pilates:'Pilates',Stretching:'Stretching',MindAndBody:'Mobility',Ride:'Bike',VirtualRide:'V.Bike',Swim:'Schwimmen'};
+function stravaCat(t){
+  if(STRAVA_RUN.includes(t))return 'run';
+  if(STRAVA_STRENGTH.includes(t))return 'strength';
+  if(STRAVA_MOBILITY.includes(t))return 'mobility';
+  return 'run';
+}
 function stravaAuthUrl(cid){
   const p=new URLSearchParams({client_id:cid,redirect_uri:window.location.origin+window.location.pathname,response_type:'code',approval_prompt:'auto',scope:'activity:read_all'});
   return `https://www.strava.com/oauth/authorize?${p}`;
@@ -842,6 +852,7 @@ function App(){
   const [stravaSetup,setStravaSetup]=useState(false);
   const [stravaToken,setStravaToken]=useState(()=>{try{return JSON.parse(localStorage.getItem(SK.token)||'null');}catch(e){return null;}});
   const [stravaActual,setStravaActual]=useState(()=>{try{return JSON.parse(localStorage.getItem(SK.actual)||'{}');}catch(e){return{};}});
+  const [stravaExtras,setStravaExtras]=useState(()=>{try{return JSON.parse(localStorage.getItem(SK.extras)||'{}');}catch(e){return{};}});
   const [syncing,setSyncing]=useState(false);
   const [lastSync,setLastSync]=useState(null);
   const [syncError,setSyncError]=useState(null);
@@ -953,38 +964,35 @@ function App(){
         if(!byDate[d])byDate[d]=[];
         byDate[d].push(a);
       });
-      const runTypes=['Run','TrailRun','Hike','Walk','VirtualRun','NordicSki'];
-      const strengthTypes=['WeightTraining','Workout','Crossfit','RockClimbing'];
-      const mobilityTypes=['Yoga','Pilates','Stretching','MindAndBody'];
-      // Match to plan
+      // Match Strava-Activities → Planned Workouts (1:1, kein Threshold). Übrige = Extras.
       const newCompleted={...completed};
       const newActual={};
+      const newExtras={};
       plan.forEach(wk=>wk.days.forEach(d=>{
         const dayActs=byDate[d.date]||[];
+        const consumed=new Set();
         d.workouts.forEach(wo=>{
           if(wo.type==='run'&&wo.km){
             const planned=wo.km*1000;
-            const match=dayActs
-              .filter(a=>runTypes.includes(a.type)&&a.distance>=planned*0.7)
-              .sort((a,b)=>Math.abs(a.distance-planned)-Math.abs(b.distance-planned))[0];
-            if(match){
-              newCompleted[wo.id]=true;
-              newActual[wo.id]=Math.round(match.distance/100)/10;
-            }
-          }
-          if(wo.type==='strength'){
-            const match=dayActs.find(a=>strengthTypes.includes(a.type));
-            if(match)newCompleted[wo.id]=true;
-          }
-          if(wo.type==='mobility'){
-            const match=dayActs.find(a=>mobilityTypes.includes(a.type));
-            if(match)newCompleted[wo.id]=true;
+            const cands=dayActs.map((a,i)=>({a,i})).filter(({a,i})=>!consumed.has(i)&&STRAVA_RUN.includes(a.type));
+            const best=cands.sort((x,y)=>Math.abs(x.a.distance-planned)-Math.abs(y.a.distance-planned))[0];
+            if(best){consumed.add(best.i);newCompleted[wo.id]=true;newActual[wo.id]=Math.round(best.a.distance/100)/10;}
+          }else if(wo.type==='strength'){
+            const idx=dayActs.findIndex((a,k)=>!consumed.has(k)&&STRAVA_STRENGTH.includes(a.type));
+            if(idx>=0){consumed.add(idx);newCompleted[wo.id]=true;}
+          }else if(wo.type==='mobility'){
+            const idx=dayActs.findIndex((a,k)=>!consumed.has(k)&&STRAVA_MOBILITY.includes(a.type));
+            if(idx>=0){consumed.add(idx);newCompleted[wo.id]=true;}
           }
         });
+        const ex=dayActs.filter((_,i)=>!consumed.has(i)).map(a=>({id:String(a.id),type:a.type,name:a.name,distance:a.distance}));
+        if(ex.length)newExtras[d.date]=ex;
       }));
       setCompleted(newCompleted);
       setStravaActual(newActual);
+      setStravaExtras(newExtras);
       localStorage.setItem(SK.actual,JSON.stringify(newActual));
+      localStorage.setItem(SK.extras,JSON.stringify(newExtras));
       setLastSync(new Date().toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'}));
     }catch(e){setSyncError(e.message||'Sync fehlgeschlagen');}
     setSyncing(false);
@@ -1244,6 +1252,24 @@ function App(){
                                   style={{background:'none',border:'none',color:'var(--tf)',cursor:'pointer',fontSize:12,padding:'0 2px',flexShrink:0,lineHeight:1}}
                                   title="Verschieben">→</button>
                               )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {(stravaExtras[d.date]||[]).map(ex=>{
+                        const cat=stravaCat(ex.type);
+                        const cfg=W_CFG[cat]||W_CFG.run;
+                        const km=ex.distance>0?(Math.round(ex.distance/100)/10)+'km':'';
+                        const label=ex.name||STRAVA_LABEL[ex.type]||ex.type;
+                        return(
+                          <div key={ex.id} className="pill" style={{background:'rgba(252,76,2,.07)',border:'1px dashed rgba(252,76,2,.45)'}}>
+                            <span style={{fontSize:16,color:'#FC4C02',flexShrink:0}}>{cfg.icon}</span>
+                            <div style={{flex:1,minWidth:0}}>
+                              <div style={{display:'flex',alignItems:'center',gap:5}}>
+                                <span style={{fontSize:15,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{label}</span>
+                                {km&&<span style={{fontSize:12,color:'#FC4C02',fontWeight:700,flexShrink:0}}>{km}</span>}
+                                <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,fontWeight:800,letterSpacing:'.08em',color:'#FC4C02',background:'rgba(252,76,2,.15)',padding:'1px 5px',borderRadius:3,flexShrink:0}}>STRAVA</span>
+                              </div>
                             </div>
                           </div>
                         );
