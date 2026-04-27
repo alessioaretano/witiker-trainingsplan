@@ -897,15 +897,20 @@ function App(){
     if(idx>=0)setActiveWeek(idx);
   },[]);// eslint-disable-line
 
-  // Auto-sync beim App-Öffnen + beim Zurückwechseln in die App
+  // Auto-sync: beim Öffnen, beim Tab-Wechsel, beim Window-Focus, alle 5 Min im Hintergrund
   useEffect(()=>{
     if(!stravaToken)return;
-    // Sync beim ersten Laden
     doSync();
-    // Sync wenn Tab/App wieder aktiv wird
     function onVisible(){if(document.visibilityState==='visible')doSync();}
+    function onFocus(){doSync();}
     document.addEventListener('visibilitychange',onVisible);
-    return()=>document.removeEventListener('visibilitychange',onVisible);
+    window.addEventListener('focus',onFocus);
+    const interval=setInterval(()=>{if(document.visibilityState==='visible')doSync();},5*60*1000);
+    return()=>{
+      document.removeEventListener('visibilitychange',onVisible);
+      window.removeEventListener('focus',onFocus);
+      clearInterval(interval);
+    };
   },[!!stravaToken]);// eslint-disable-line
 
   // Strava OAuth callback handler
