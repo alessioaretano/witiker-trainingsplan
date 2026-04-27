@@ -388,8 +388,19 @@ const W_CFG={
   race:     {icon:'⚡', bg:'rgba(249,115,22,.08)',   border:'rgba(249,115,22,.38)',   color:'#F97316'},
 };
 
-function kmDoneWeek(week,completed){
-  return week.days.reduce((a,d)=>a+d.workouts.filter(w=>w.type==='run'&&completed[w.id]).reduce((b,w)=>b+(w.km||0),0),0);
+function kmDoneWeek(week,completed,stravaActual,stravaExtras){
+  const sa=stravaActual||{};
+  const se=stravaExtras||{};
+  let total=0;
+  week.days.forEach(d=>{
+    d.workouts.filter(w=>w.type==='run'&&completed[w.id]).forEach(w=>{
+      total+=sa[w.id]!=null?sa[w.id]:(w.km||0);
+    });
+    (se[d.date]||[]).forEach(ex=>{
+      if(stravaCat(ex.type)==='run'&&ex.distance>0)total+=Math.round(ex.distance/100)/10;
+    });
+  });
+  return total;
 }
 
 /* ── STRAVA ──────────────────────────────────────── */
@@ -1035,8 +1046,9 @@ function App(){
 
   const RACE_DATE=new Date('2026-05-14T12:00:00');
   const daysLeft=Math.max(0,Math.ceil((RACE_DATE-new Date())/86400000));
-  const kmDone=useMemo(()=>kmDoneWeek(week,completed),[week,completed]);
-  const pct=Math.min(100,Math.round(kmDone/week.targetKm*100));
+  const kmDone=useMemo(()=>kmDoneWeek(week,completed,stravaActual,stravaExtras),[week,completed,stravaActual,stravaExtras]);
+  const pct=Math.round(kmDone/week.targetKm*100);
+  const barPct=Math.min(100,pct);
 
   function openWorkout(wo,d){setModal({wo,day:d});}
   function closeModal(){setModal(null);}
@@ -1149,7 +1161,7 @@ function App(){
                 </div>
               </div>
               <div className="prog-bar">
-                <div className="prog-fill" style={{width:`${pct}%`,background:week.color}}/>
+                <div className="prog-fill" style={{width:`${barPct}%`,background:week.color}}/>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
                 {[
