@@ -867,6 +867,8 @@ function App(){
   const [syncing,setSyncing]=useState(false);
   const [lastSync,setLastSync]=useState(null);
   const [syncError,setSyncError]=useState(null);
+  const [lastActsRaw,setLastActsRaw]=useState([]);
+  const [debugOpen,setDebugOpen]=useState(false);
 
   // ── PERSISTENT STATE: completed ───────────────────
   const [completed,setCompleted]=useState(()=>{
@@ -973,6 +975,8 @@ function App(){
         acts.push(...batch);
         if(batch.length<100)break;
       }
+      setLastActsRaw(acts);
+      console.log('[Strava sync]',acts.length,'Aktivitäten geladen',acts.slice(-5).map(a=>({date:a.start_date_local?.slice(0,10),type:a.type,sport_type:a.sport_type,name:a.name,km:(a.distance/1000).toFixed(2)})));
       // Group by date (all types)
       const byDate={};
       acts.forEach(a=>{
@@ -1107,6 +1111,12 @@ function App(){
                 style={{background:'rgba(252,76,2,.08)',border:'1px solid rgba(252,76,2,.25)',color:'rgba(252,76,2,.7)',borderRadius:5,padding:'4px 9px',cursor:'pointer',fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:'.04em'}}>
                 Strava
               </button>
+            )}
+            {stravaToken&&(
+              <button
+                onClick={()=>setDebugOpen(true)}
+                style={{background:'rgba(232,234,240,.06)',border:'1px solid rgba(232,234,240,.12)',color:'rgba(232,234,240,.45)',borderRadius:5,padding:'4px 9px',cursor:'pointer',fontSize:11,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:'.04em'}}
+                title="Strava Debug">ⓘ</button>
             )}
             <button
               onClick={()=>window.location.reload()}
@@ -1330,6 +1340,40 @@ function App(){
           onClose={()=>setStravaSetup(false)}
           onConnect={(cid)=>{window.location.href=stravaAuthUrl(cid);}}
         />
+      )}
+      {debugOpen&&(
+        <div onClick={()=>setDebugOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.75)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:'var(--s1)',border:'1px solid var(--border)',borderRadius:8,padding:16,maxWidth:560,width:'100%',maxHeight:'80vh',overflow:'auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:800,color:'#FC4C02',letterSpacing:'.02em'}}>STRAVA DEBUG</div>
+              <button onClick={()=>setDebugOpen(false)} style={{background:'none',border:'none',color:'var(--td)',fontSize:20,cursor:'pointer'}}>×</button>
+            </div>
+            <div style={{fontSize:12,color:'var(--td)',marginBottom:12,lineHeight:1.5}}>
+              <b style={{color:'var(--tx)'}}>{lastActsRaw.length}</b> Aktivitäten geladen · letzter Sync: <b style={{color:'var(--tx)'}}>{lastSync||'—'}</b><br/>
+              Plan-Range: {(()=>{const ad=plan.flatMap(wk=>wk.days.map(d=>d.date)).filter(Boolean).sort();return ad[0]+' bis '+ad[ad.length-1];})()}
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:6}}>
+              {[...lastActsRaw].reverse().slice(0,20).map(a=>{
+                const known=stravaCat(a.type)&&(STRAVA_RUN.includes(a.type)||STRAVA_STRENGTH.includes(a.type)||STRAVA_MOBILITY.includes(a.type));
+                return(
+                  <div key={a.id} style={{fontSize:11,padding:'7px 9px',background:'rgba(232,234,240,.04)',border:`1px solid ${known?'rgba(252,76,2,.25)':'rgba(248,113,113,.45)'}`,borderRadius:4,fontFamily:'monospace'}}>
+                    <div style={{color:'#FC4C02',fontWeight:700}}>{a.start_date_local?.slice(0,16).replace('T',' ')||'?'}</div>
+                    <div style={{color:'var(--tx)'}}>{a.name}</div>
+                    <div style={{color:'var(--td)',marginTop:2}}>
+                      type: <b style={{color:known?'#22c55e':'#F87171'}}>{a.type}</b>
+                      {a.sport_type&&a.sport_type!==a.type&&<span> · sport_type: <b>{a.sport_type}</b></span>}
+                      {a.distance>0&&<span> · {(a.distance/1000).toFixed(2)} km</span>}
+                    </div>
+                  </div>
+                );
+              })}
+              {!lastActsRaw.length&&<div style={{color:'#F87171',fontSize:12,padding:8}}>Noch nichts geladen — Strava-Pille tippen oder Seite neu laden.</div>}
+            </div>
+            <div style={{fontSize:10,color:'var(--tf)',marginTop:12,lineHeight:1.5}}>
+              <span style={{color:'#22c55e'}}>Grün</span> = bekannter Type (matched). <span style={{color:'#F87171'}}>Rot</span> = unbekannter Type (wird übersprungen — sag mir den Type, dann mappe ich ihn).
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
