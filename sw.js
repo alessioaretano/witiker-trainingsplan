@@ -1,4 +1,4 @@
-const CACHE = 'aneo-v1';
+const CACHE = 'aneo-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 
@@ -15,6 +15,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  // Strava API/OAuth: niemals cachen, immer Netzwerk
+  if (url.includes('strava.com/')) return;
+  // Alles ausser GET ignorieren (POST etc. nicht cachen)
+  if (e.request.method !== 'GET') return;
   if (e.request.mode === 'navigate') {
     // Network-first für HTML → immer neuste Version
     e.respondWith(
