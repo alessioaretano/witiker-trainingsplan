@@ -1,4 +1,4 @@
-const CACHE = 'aneo-v3';
+const CACHE = 'aneo-v4';
 
 self.addEventListener('install', () => self.skipWaiting());
 

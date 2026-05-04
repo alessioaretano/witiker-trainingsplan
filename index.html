@@ -224,7 +224,7 @@ const PLAN_VERSION='v12';
 /* ── PLAN FACTORY ────────────────────────────────── */
 const run =(id,t,km,dur,hr,desc,tags)=>({id,type:'run',title:t,km,duration:dur,hr,description:desc,tags:tags||[]});
 const str =(id,k,note)=>({id,type:'strength',title:`Kraft ${k}${note?` (${note})`:''}`,routineKey:k});
-const mob =(id,t)=>({id,type:'mobility',title:t||'Mobility 18–20 Min'});
+const mob =(id,t)=>({id,type:'mobility',title:t||'Mobility'});
 const race=()=>({id:'RACE',type:'race',title:'WITIKER BACKYARD ULTRA'});
 const day =(date,label,workouts)=>({date,label,workouts:[...workouts]});
 
